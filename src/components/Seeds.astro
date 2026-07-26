@@ -4,8 +4,8 @@ import { seedsFlow } from '../data/site';
 
 <section id="seeds" class="relative overflow-hidden py-24 lg:py-40">
   <div
-    class="pointer-events-none absolute left-1/2 top-1/2 size-[80vw] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-35 blur-[150px]"
-    style="background: radial-gradient(circle, rgba(224,169,87,0.18), transparent 65%)"
+    class="pointer-events-none absolute left-1/2 top-1/2 size-[80vw] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-35"
+    style="background: radial-gradient(circle, rgba(224,169,87,0.16), rgba(224,169,87,0.05) 42%, transparent 72%)"
     aria-hidden="true"
   ></div>
 
@@ -15,15 +15,26 @@ import { seedsFlow } from '../data/site';
       <!-- ── Moneda 3D (WebGL con fallback al SVG plano) ── -->
       <div class="order-2 lg:order-1 lg:col-span-5">
         <div data-reveal="scale" class="relative mx-auto w-full max-w-[340px]">
+          <!-- Halo estático DETRÁS de la moneda. Importante: nada de
+               filter/drop-shadow sobre el canvas ni sobre la Seed animada —
+               un filtro sobre un elemento que se repinta cada frame obliga
+               al navegador a recalcular la sombra 60 veces por segundo. -->
           <div
-            class="seed3d relative z-10 aspect-square w-full cursor-grab active:cursor-grabbing"
-            style="filter: drop-shadow(0 30px 70px rgba(224,169,87,0.28)); touch-action: pan-y"
+            class="pointer-events-none absolute inset-[-18%] z-0 rounded-full opacity-70"
+            style="background: radial-gradient(circle, rgba(224,169,87,0.30), rgba(224,169,87,0.10) 45%, transparent 70%)"
+            aria-hidden="true"
           ></div>
+          <!-- La Seed plana se ve desde el primer instante; el canvas 3D se
+               construye en tiempo muerto y entra con un fundido cuando está listo. -->
           <img
             src="/brand/seed.svg"
             alt="Seed de oro, la moneda de Chess Fortune"
-            class="seed-fallback relative z-10 hidden w-full animate-[coinFloat_9s_ease-in-out_infinite] drop-shadow-[0_30px_70px_rgba(224,169,87,0.28)]"
+            class="seed-fallback relative z-10 w-full animate-[coinFloat_9s_ease-in-out_infinite] transition-opacity duration-700"
           />
+          <div
+            class="seed3d absolute inset-0 z-20 cursor-grab opacity-0 transition-opacity duration-700 active:cursor-grabbing"
+            style="touch-action: pan-y"
+          ></div>
           <div class="pointer-events-none absolute inset-[-12%] animate-[spin_28s_linear_infinite] rounded-full border border-dashed border-gold/20" aria-hidden="true"></div>
           <div class="pointer-events-none absolute inset-[-24%] animate-[spin_46s_linear_infinite_reverse] rounded-full border border-gold/10" aria-hidden="true"></div>
         </div>
@@ -72,7 +83,6 @@ import { seedsFlow } from '../data/site';
    */
   import * as THREE from 'three';
   import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
-  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
   const CFG = {
     gold: 0xe0a957,
@@ -91,14 +101,44 @@ import { seedsFlow } from '../data/site';
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 20);
     camera.position.set(0, 0, 4.6);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
     holder.appendChild(renderer.domElement);
 
+    /* Entorno de reflejos procedural: un equirect de 64×32 con degradado de
+       estudio (techo cálido, banda de luz, suelo azul profundo). Da al metal
+       el mismo carácter que RoomEnvironment por ~1% de su coste, que es lo
+       que permitía que la construcción congelara el scroll en equipos lentos. */
+    const cede = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+
+    function crearEntorno() {
+      const w = 64, h = 32;
+      const data = new Uint8Array(w * h * 4);
+      const mez = (a: number[], b: number[], t: number) => a.map((v, i) => v + (b[i] - v) * t);
+      const techo = [255, 240, 214], medio = [224, 169, 87], suelo = [10, 14, 26];
+      for (let y = 0; y < h; y++) {
+        const t = y / (h - 1);
+        let c = t < 0.5 ? mez(techo, medio, t * 2) : mez(medio, suelo, (t - 0.5) * 2);
+        // banda de luz especular a media altura
+        const brillo = Math.max(0, 1 - Math.abs(t - 0.38) * 9);
+        c = mez(c, [255, 250, 235], brillo * 0.85);
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          data[i] = c[0]; data[i + 1] = c[1]; data[i + 2] = c[2]; data[i + 3] = 255;
+        }
+      }
+      const tex = new THREE.DataTexture(data, w, h);
+      tex.mapping = THREE.EquirectangularReflectionMapping;
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.needsUpdate = true;
+      return tex;
+    }
+
     const pmrem = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = pmrem.fromEquirectangular(crearEntorno()).texture;
+    await cede();
 
     const key = new THREE.DirectionalLight(0xffdba5, 1.4);
     key.position.set(2.5, 2, 3);
@@ -115,9 +155,9 @@ import { seedsFlow } from '../data/site';
     scene.add(coin);
 
     const zAxis = (g: THREE.BufferGeometry) => { g.rotateX(Math.PI / 2); return g; };
-    coin.add(new THREE.Mesh(zAxis(new THREE.CylinderGeometry(1, 1, CFG.thickness, 128)), matBody));
-    coin.add(new THREE.Mesh(zAxis(new THREE.CylinderGeometry(0.8, 0.8, CFG.thickness + 0.012, 128)), matBody));
-    coin.add(new THREE.Mesh(zAxis(new THREE.CylinderGeometry(0.67, 0.67, CFG.thickness + 0.022, 128)), matDisc));
+    coin.add(new THREE.Mesh(zAxis(new THREE.CylinderGeometry(1, 1, CFG.thickness, 96)), matBody));
+    coin.add(new THREE.Mesh(zAxis(new THREE.CylinderGeometry(0.8, 0.8, CFG.thickness + 0.012, 96)), matBody));
+    coin.add(new THREE.Mesh(zAxis(new THREE.CylinderGeometry(0.67, 0.67, CFG.thickness + 0.022, 96)), matDisc));
 
     // Brote acuñado: extruimos el path real del SVG de marca
     const svgText = await fetch('/brand/seed.svg').then((r) => r.text());
@@ -149,6 +189,7 @@ import { seedsFlow } from '../data/site';
       back.position.z = -front.position.z;
       coin.add(back);
     }
+    await cede();
 
     // Interacción: giro automático + arrastre + inclinación al cursor
     let targetRX = 0, targetRY = 0, dragging = false, px = 0, py = 0;
@@ -177,7 +218,12 @@ import { seedsFlow } from '../data/site';
       coin.rotation.y += (targetRY - coin.rotation.y) * 0.08;
       coin.rotation.x += (targetRX - coin.rotation.x) * 0.06;
       coin.position.y = Math.sin(t * 0.8) * CFG.floatAmp;
-      renderer.render(scene, camera);
+      /* Mientras el usuario hace scroll, NO se renderiza: el giro se congela
+         de forma imperceptible y retoma 250 ms después de soltar. Así el 3D
+         tiene coste cero durante el desplazamiento en cualquier dispositivo. */
+      if (dragging || performance.now() - ultimoScroll > 250) {
+        renderer.render(scene, camera);
+      }
       rafId = requestAnimationFrame(frame);
     }
 
@@ -190,6 +236,14 @@ import { seedsFlow } from '../data/site';
     }
     new ResizeObserver(resize).observe(holder);
     resize();
+
+    // Precompilar shaders y pintar un frame AHORA (estamos en tiempo muerto,
+    // no durante el scroll del usuario) y recién entonces hacer el fundido.
+    renderer.compile(scene, camera);
+    renderer.render(scene, camera);
+    holder.style.opacity = '1';
+    holder.closest('[data-reveal]')?.querySelector<HTMLElement>('.seed-fallback')
+      ?.style.setProperty('opacity', '0');
 
     if (reduced) {
       coin.rotation.set(0.15, -0.4, 0);
@@ -215,14 +269,50 @@ import { seedsFlow } from '../data/site';
     }, { once: true });
   }
 
+  /* La construcción del 3D (shaders + entorno de reflejos) bloquea el hilo
+     unos instantes. En máquinas lentas ese instante puede notarse, así que
+     además de lanzarla en tiempo muerto, NUNCA se ejecuta mientras el
+     usuario está desplazándose: espera a 400 ms de scroll en calma. */
+  let ultimoScroll = 0;
+  addEventListener('scroll', () => (ultimoScroll = performance.now()), { passive: true });
+
+  function lanzar(holder: HTMLElement) {
+    if (holder.dataset.init) return;
+    holder.dataset.init = '1';
+    const cuandoHayaCalma = () => {
+      if (performance.now() - ultimoScroll < 400) {
+        setTimeout(cuandoHayaCalma, 250);
+        return;
+      }
+      buildCoin(holder).catch((err) => {
+        console.warn('WebGL no disponible; se mantiene la moneda plana:', err);
+        holder.remove(); // la Seed plana ya está visible debajo
+      });
+    };
+    cuandoHayaCalma();
+  }
+
   function initSeed3d() {
     document.querySelectorAll<HTMLElement>('.seed3d:not([data-init])').forEach((holder) => {
-      holder.dataset.init = '1';
-      buildCoin(holder).catch((err) => {
-        console.warn('WebGL no disponible, usando la moneda plana:', err);
-        holder.remove();
-        holder.closest('[data-reveal]')?.querySelector('.seed-fallback')?.classList.remove('hidden');
-      });
+      /**
+       * NO construir el 3D al llegar a la sección: la compilación de shaders
+       * y el entorno de reflejos bloquean el hilo justo cuando el usuario
+       * está haciendo scroll ("el scroll falla al pasar Features"). En su
+       * lugar, dos disparadores que apuntan a tiempo muerto:
+       *   1. requestIdleCallback tras la carga (caso normal), y
+       *   2. un IntersectionObserver con 1200px de antelación, por si el
+       *      usuario baja a toda velocidad antes de que llegue el idle.
+       * Mientras tanto la Seed plana ya está en pantalla; el canvas entra
+       * con un fundido cuando su primer frame está pintado.
+       */
+      const idle = (window as any).requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 1200));
+      idle(() => lanzar(holder), { timeout: 3000 });
+
+      const io = new IntersectionObserver(
+        ([e]) => { if (e.isIntersecting) { io.disconnect(); lanzar(holder); } },
+        { rootMargin: '1200px 0px' }
+      );
+      io.observe(holder);
     });
   }
 
