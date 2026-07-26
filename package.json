@@ -14,7 +14,6 @@
     "@fontsource/young-serif": "^5.2.5",
     "@tailwindcss/vite": "^4.1.4",
     "astro": "^5.6.1",
-    "tailwindcss": "^4.1.4",
-    "three": "^0.160.0"
+    "tailwindcss": "^4.1.4"
   }
 }
