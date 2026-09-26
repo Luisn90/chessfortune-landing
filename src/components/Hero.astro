@@ -1,10 +1,11 @@
 ---
 import Piece from './Piece.astro';
 import SeedMark from './SeedMark.astro';
+import { site } from '../data/site';
 
 const lines = [
-  { text: 'Juega al ajedrez,', accent: false },
-  { text: 'conquista el mundo', accent: true },
+  { text: '¡Juega al ajedrez', accent: false },
+  { text: 'y conquista el mundo!', accent: true },
 ];
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 ---
@@ -47,13 +48,15 @@ const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       </h1>
 
       <p data-reveal="up" style="--reveal-delay:640ms" class="mt-9 max-w-lg text-lg leading-relaxed text-mist">
-        Una sala global abierta las 24 horas donde cada partida se juega por
-        <strong class="font-normal text-white">Seeds</strong>. Tú eliges el tablero, el reloj y cuánto hay en juego. El ganador se lo lleva todo.
+        Únete a nuestra vibrante comunidad de jugadores de ajedrez y pon a prueba tus habilidades en partidas emocionantes.
       </p>
 
       <div data-reveal="up" style="--reveal-delay:760ms" class="mt-11 flex flex-wrap items-center gap-4">
-        <a href="/juego" class="btn-gold px-9 py-4 font-sans text-[0.76rem] font-medium uppercase tracking-[0.22em] text-navy">Descubre el juego</a>
-        <a href="https://discord.com/invite/fJd4RSMnTy" rel="noopener" class="btn-ghost border border-line px-8 py-4 font-sans text-[0.76rem] uppercase tracking-[0.22em] text-ivory">Únete al Discord</a>
+        <a href={site.playStore} target="_blank" rel="noopener" class="btn-gold inline-flex items-center gap-3 px-9 py-4 font-sans text-[0.76rem] font-medium uppercase tracking-[0.22em] text-navy">
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          Descarga la app
+        </a>
+        <a href={site.discord} rel="noopener" class="btn-ghost border border-line px-8 py-4 font-sans text-[0.76rem] uppercase tracking-[0.22em] text-ivory">Únete al Discord</a>
       </div>
     </div>
 
