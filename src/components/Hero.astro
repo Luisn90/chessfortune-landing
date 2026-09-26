@@ -1,34 +1,44 @@
 ---
 import { site } from '../data/site';
-import Pawn3D from './Pawn3D.astro';
 
 const lines = [
   { text: '¡Juega al ajedrez', accent: false },
   { text: 'y conquista el mundo!', accent: true },
 ];
+
+// Piezas de fondo (renders Blender con el desenfoque ya horneado en el WebP).
+// depth: cuánto se desplazan con el ratón (cercanas más); par: parallax de scroll.
+const pieces = [
+  { src: 'bg-queen',  w: 239, h: 348, depth: -6,  par: 0.35, float: '15s', delay: '-4s', pos: 'hidden lg:block left-[25%] top-[6%]',                  size: 'w-[clamp(80px,7.5vw,115px)]', op: 'opacity-55' },
+  { src: 'bg-bishop', w: 260, h: 382, depth: -9,  par: 0.3,  float: '14s', delay: '-9s', pos: 'hidden lg:block right-[21%] top-[9%]',                 size: 'w-[clamp(90px,8.5vw,130px)]', op: 'opacity-60' },
+  { src: 'bg-pawn',   w: 245, h: 334, depth: -8,  par: 0.4,  float: '12s', delay: '-2s', pos: '-left-[3%] bottom-[5%] lg:left-[17%] lg:bottom-[5%]',  size: 'w-[20vw] max-w-[90px] lg:w-[clamp(90px,8vw,125px)] lg:max-w-none', op: 'opacity-45 lg:opacity-60' },
+  { src: 'bg-rook',   w: 342, h: 456, depth: -12, par: 0.25, float: '16s', delay: '-6s', pos: '-right-[6%] bottom-[3%] lg:right-[15%] lg:-bottom-[3%]', size: 'w-[28vw] max-w-[120px] lg:w-[clamp(140px,13vw,195px)] lg:max-w-none', op: 'opacity-45 lg:opacity-70' },
+  { src: 'bg-king',   w: 336, h: 546, depth: -18, par: 0.15, float: '13s', delay: '-8s', pos: '-right-[9%] top-[12%] lg:right-[6%] lg:top-[28%]',     size: 'w-[26vw] max-w-[110px] lg:w-[clamp(150px,13.5vw,205px)] lg:max-w-none', op: 'opacity-45 lg:opacity-85' },
+  { src: 'bg-knight', w: 406, h: 634, depth: -26, par: 0.1,  float: '11s', delay: '0s',  pos: '-left-[8%] top-[10%] lg:left-[6%] lg:top-[19%]',      size: 'w-[30vw] max-w-[130px] lg:w-[clamp(170px,16vw,245px)] lg:max-w-none', op: 'opacity-50 lg:opacity-100' },
+];
 ---
 
-<section data-reveal-instant class="relative flex min-h-[100svh] items-center overflow-hidden pb-16 pt-24 lg:pb-24 lg:pt-32" aria-labelledby="hero-title">
+<section data-reveal-instant data-hero-depth class="relative flex min-h-[100svh] items-center overflow-hidden pb-20 pt-28 lg:pb-24 lg:pt-32" aria-labelledby="hero-title">
   <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-    <div class="absolute -right-[15%] top-[8%] size-[70vw] max-w-[900px] rounded-full opacity-45" style="background: radial-gradient(circle, rgba(224,169,87,0.20), rgba(224,169,87,0.06) 42%, transparent 72%)"></div>
+    <div class="absolute left-1/2 top-1/2 size-[90vw] max-w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50" style="background: radial-gradient(circle, rgba(224,169,87,0.14), rgba(224,169,87,0.04) 40%, transparent 70%)"></div>
   </div>
 
-  <!-- Piezas 3D (render Blender pre-horneado): profundidad por capas, desenfoque ya aplicado en el WebP -->
   <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-    <div data-parallax="0.18" class="absolute -right-[1%] bottom-[4%] hidden lg:block">
-      <img src="/hero/hero-bishop.webp" alt="" width="240" height="340" decoding="async" class="w-[clamp(110px,10vw,160px)] opacity-60 animate-[float_14s_ease-in-out_infinite_-7s]" />
-    </div>
-    <div data-parallax="0.45" class="absolute -bottom-[10%] right-[30%] hidden lg:block">
-      <img src="/hero/hero-rook.webp" alt="" width="415" height="556" decoding="async" class="w-[clamp(170px,15vw,230px)] opacity-50" />
-    </div>
+    {pieces.map((p) => (
+      <div data-parallax={p.par} class:list={['absolute', p.pos]}>
+        <div data-depth={p.depth} class="will-change-transform">
+          <img
+            src={`/hero/${p.src}.webp`} alt="" width={p.w} height={p.h} decoding="async"
+            class:list={[p.size, p.op]}
+            style={`animation: float ${p.float} ease-in-out ${p.delay} infinite`}
+          />
+        </div>
+      </div>
+    ))}
   </div>
 
-  <div class="relative mx-auto grid w-full max-w-[1400px] items-center gap-4 px-6 lg:grid-cols-12 lg:gap-8 lg:px-10">
-    <div data-reveal="scale" style="--reveal-delay:300ms" class="order-first lg:order-last lg:col-span-5">
-      <Pawn3D class="mx-auto h-[31svh] min-h-[210px] max-h-[360px] w-full max-w-[420px] sm:h-[38svh] sm:max-h-[420px] lg:h-[min(76svh,720px)] lg:max-h-none lg:max-w-none" />
-    </div>
-    <div class="lg:col-span-7">
-      <div data-reveal="up" class="mb-6 inline-flex items-center gap-3 rounded-chip lg:mb-9 border border-gold/25 bg-surface/60 px-5 py-2 backdrop-blur-sm">
+  <div class="relative mx-auto flex w-full max-w-[1400px] flex-col items-center px-6 text-center lg:px-10">
+    <div data-reveal="up" class="mb-6 inline-flex items-center gap-3 rounded-chip lg:mb-9 border border-gold/25 bg-surface/60 px-5 py-2 backdrop-blur-sm">
         <span class="relative flex size-1.5">
           <span class="absolute inline-flex size-full animate-ping rounded-full bg-gold opacity-75"></span>
           <span class="relative inline-flex size-1.5 rounded-full bg-gold"></span>
@@ -46,19 +56,17 @@ const lines = [
         ))}
       </h1>
 
-      <p data-reveal="up" style="--reveal-delay:640ms" class="mt-5 max-w-lg text-base leading-relaxed text-mist sm:text-lg lg:mt-9">
+      <p data-reveal="up" style="--reveal-delay:640ms" class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-mist sm:text-lg lg:mt-9">
         Únete a nuestra vibrante comunidad de jugadores de ajedrez y pon a prueba tus habilidades en partidas emocionantes.
       </p>
 
-      <div data-reveal="up" style="--reveal-delay:760ms" class="mt-7 flex flex-wrap items-center gap-3 sm:gap-4 lg:mt-11">
+      <div data-reveal="up" style="--reveal-delay:760ms" class="mt-7 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:mt-11">
         <a href={site.playStore} target="_blank" rel="noopener" class="btn-gold inline-flex items-center gap-3 px-9 py-4 font-sans text-[0.76rem] font-medium uppercase tracking-[0.22em] text-navy">
           <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
           Descarga la app
         </a>
         <a href={site.discord} rel="noopener" class="btn-ghost border border-line px-8 py-4 font-sans text-[0.76rem] uppercase tracking-[0.22em] text-ivory">Únete al Discord</a>
       </div>
-    </div>
-
   </div>
 
   <div class="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex" aria-hidden="true">
@@ -68,3 +76,27 @@ const lines = [
     </span>
   </div>
 </section>
+
+<script>
+  // Profundidad con el ratón: cada capa se desplaza según su data-depth (solo puntero fino).
+  function initHeroDepth() {
+    const root = document.querySelector<HTMLElement>('[data-hero-depth]');
+    if (!root || root.dataset.depthBound) return;
+    root.dataset.depthBound = '1';
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const layers = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]')).map((el) => ({ el, d: parseFloat(el.dataset.depth || '0') }));
+    let tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
+    const loop = () => {
+      cx += (tx - cx) * 0.06; cy += (ty - cy) * 0.06;
+      for (const l of layers) l.el.style.transform = `translate3d(${(cx * l.d).toFixed(2)}px, ${(cy * l.d).toFixed(2)}px, 0)`;
+      raf = Math.abs(tx - cx) + Math.abs(ty - cy) > 0.0015 ? requestAnimationFrame(loop) : 0;
+    };
+    const onMove = (e: PointerEvent) => {
+      tx = (e.clientX / innerWidth) * 2 - 1; ty = (e.clientY / innerHeight) * 2 - 1;
+      if (!raf) raf = requestAnimationFrame(loop);
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('astro:before-swap', () => { window.removeEventListener('pointermove', onMove); cancelAnimationFrame(raf); }, { once: true });
+  }
+  document.addEventListener('astro:page-load', initHeroDepth);
+</script>

@@ -99,6 +99,75 @@ elif PIECE == 'knight':
         v.co.y *= (1 - f)
     for p_ in me.polygons: p_.use_smooth = False
     objs = [body, head]; H = 2.0
+elif PIECE == 'queen':
+    prof = base_profile([(0.52,0.36),(0.40,0.48),(0.28,1.10),(0.46,1.16),(0.46,1.22),(0.30,1.26),(0.34,1.40),(0.46,1.62),(0.52,1.72),(0.40,1.75),(0.22,1.80),(0.10,1.86),(0,1.87)])
+    body = lathe('queen', prof)
+    for i in range(9):
+        a = i*2*math.pi/9
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.085, location=(0.53*math.cos(a), 0.53*math.sin(a), 1.76))
+        cut(body, bpy.context.active_object)
+    ball = lathe('ball', [(0,1.84)] + [(0.11*math.sin(k/16*math.pi), 1.95-0.11*math.cos(k/16*math.pi)) for k in range(1,17)])
+    objs = [body, ball]; H = 2.15
+elif PIECE == 'king':
+    prof = base_profile([(0.52,0.36),(0.40,0.48),(0.30,1.12),(0.48,1.18),(0.48,1.24),(0.32,1.28),(0.36,1.44),(0.45,1.64),(0.43,1.72),(0.24,1.76),(0.12,1.80),(0,1.81)])
+    body = lathe('king', prof)
+    v = box((0,0,2.00),(0.055,0.055,0.20)); h = box((0,0,2.04),(0.15,0.055,0.05))
+    objs = [body, v, h]; H = 2.3
+elif PIECE == 'knight2':
+    import numpy as np
+    prof = [(0,0),(0.72,0),(0.74,0.03),(0.74,0.12),(0.70,0.16),(0.62,0.19),(0.60,0.24),(0.54,0.27),(0.50,0.34),(0.47,0.40),(0.52,0.45),(0.54,0.51),(0.50,0.56),(0.44,0.60),(0.44,0.66),(0.40,0.70),(0,0.70)]
+    body = lathe('kbase', prof)
+    pts = [(-0.40,0.62),(0.34,0.62),(0.42,0.78),(0.44,0.95),(0.37,1.08),(0.31,1.14),(0.36,1.22),(0.50,1.25),(0.66,1.24),(0.79,1.21),(0.88,1.25),(0.91,1.33),(0.87,1.42),(0.73,1.52),(0.57,1.64),(0.45,1.76),(0.40,1.87),(0.36,1.99),(0.30,2.13),(0.22,2.01),(0.14,1.98),(-0.02,1.94),(-0.22,1.84),(-0.38,1.66),(-0.48,1.44),(-0.53,1.18),(-0.50,0.90)]
+    me = bpy.data.meshes.new('head'); head = bpy.data.objects.new('head', me); sc.collection.objects.link(head)
+    bm = bmesh.new()
+    f1 = [bm.verts.new((x, -0.3, z)) for x, z in pts]
+    f2 = [bm.verts.new((x, 0.3, z)) for x, z in pts]
+    bm.faces.new(f1[::-1]); bm.faces.new(f2)
+    n = len(pts)
+    for i in range(n):
+        j = (i+1) % n
+        bm.faces.new((f1[i], f1[j], f2[j], f2[i]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    bpy.context.view_layer.objects.active = head
+    rm = head.modifiers.new('rm', 'REMESH'); rm.mode = 'VOXEL'; rm.voxel_size = 0.014
+    bpy.ops.object.modifier_apply(modifier='rm')
+    P = np.array(pts); A = P; B = np.roll(P, -1, axis=0)
+    co = np.zeros(len(me.vertices)*3); me.vertices.foreach_get('co', co); co = co.reshape(-1,3)
+    Q = co[:, [0,2]]
+    AB = B - A
+    tt = np.clip(((Q[:,None,:]-A[None])*AB[None]).sum(-1) / (AB**2).sum(-1)[None], 0, 1)
+    proj = A[None] + tt[...,None]*AB[None]
+    d = np.sqrt(((Q[:,None,:]-proj)**2).sum(-1)).min(1)
+    x, z = Q[:,0], Q[:,1]
+    cl = lambda v: np.clip(v, 0, 1)
+    T = 0.28 - 0.11*cl((x-0.30)/0.55) - 0.12*cl((z-1.88)/0.22) - 0.05*cl((0.9-z)/0.3)
+    prof_f = 0.30 + 0.70*np.sqrt(cl(d/0.16))
+    co[:,1] = np.sign(co[:,1]) * np.abs(co[:,1])/0.3 * T * prof_f
+    me.vertices.foreach_set('co', co.ravel()); me.update()
+    sm = head.modifiers.new('sm', 'SMOOTH'); sm.factor = 0.8; sm.iterations = 10
+    bpy.ops.object.modifier_apply(modifier='sm')
+    def surf_y(px, pz):
+        q = np.array([px, pz]); tt_ = np.clip(((q-A)*AB).sum(-1)/(AB**2).sum(-1), 0, 1)
+        dd = np.sqrt(((q-(A+tt_[:,None]*AB))**2).sum(-1)).min()
+        T_ = 0.28 - 0.11*min(max((px-0.30)/0.55,0),1) - 0.12*min(max((pz-1.88)/0.22,0),1)
+        return T_*(0.30+0.70*math.sqrt(min(dd/0.16,1)))
+    def sphere(loc, r, sy=1.0):
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=r, location=loc, segments=24, ring_count=12)
+        o = bpy.context.active_object; o.scale = (1.25, sy, 1.0); return o
+    for sgn in (-1, 1):
+        cut(head, sphere((0.47, sgn*(surf_y(0.47,1.67)+0.022), 1.67), 0.052, 0.8))   # ojo hundido
+        cut(head, sphere((0.83, sgn*(surf_y(0.83,1.37)+0.018), 1.37), 0.036, 0.8))   # ollar
+    cut(head, box((0.30, 0, 2.10), (0.10, 0.028, 0.10)))                              # separa las dos orejas
+    cut(head, box((0.80, 0, 1.285), (0.11, 0.4, 0.011), (0, math.radians(8), 0)))    # boca
+    mane = [(-0.04,1.92,-12),(-0.17,1.86,-25),(-0.29,1.76,-38),(-0.38,1.64,-50),(-0.45,1.50,-62),(-0.50,1.35,-72),(-0.52,1.20,-82),(-0.52,1.05,-90)]
+    for mx, mz, ang in mane:
+        a_ = math.radians(ang)
+        c = box((mx, 0, mz), (0.13, 0.4, 0.016), (0, a_+math.pi/2, 0))
+        cut(head, c)
+    for p_ in me.polygons: p_.use_smooth = True
+    me.use_auto_smooth = True; me.auto_smooth_angle = math.radians(60)
+    objs = [body, head]; H = 2.2
 
 for o in objs:
     o.data.materials.append(mat)
