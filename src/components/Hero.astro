@@ -1,16 +1,13 @@
 ---
-import Piece from './Piece.astro';
-import SeedMark from './SeedMark.astro';
 import { site } from '../data/site';
 
 const lines = [
   { text: '¡Juega al ajedrez', accent: false },
   { text: 'y conquista el mundo!', accent: true },
 ];
-const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 ---
 
-<section class="relative flex min-h-[100svh] items-end overflow-hidden pb-16 pt-32 lg:pb-24" aria-labelledby="hero-title">
+<section class="relative flex min-h-[100svh] items-center overflow-hidden pb-24 pt-32" aria-labelledby="hero-title">
   <div class="pointer-events-none absolute inset-0" aria-hidden="true">
     <div class="absolute -right-[15%] top-[8%] size-[70vw] max-w-[900px] rounded-full opacity-45" style="background: radial-gradient(circle, rgba(224,169,87,0.20), rgba(224,169,87,0.06) 42%, transparent 72%)"></div>
   </div>
@@ -23,11 +20,11 @@ const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     <div data-parallax="0.18" class="absolute -right-[1%] bottom-[4%] hidden lg:block">
       <img src="/hero/hero-bishop.webp" alt="" width="240" height="340" decoding="async" class="w-[clamp(110px,10vw,160px)] opacity-60 animate-[float_14s_ease-in-out_infinite_-7s]" />
     </div>
-    <div data-parallax="0.1" class="absolute -right-[8%] top-[6%] w-[46vw] max-w-[260px] opacity-25 sm:right-[5%] sm:opacity-35 lg:right-[max(2.5rem,calc((100vw-1400px)/2+2.5rem+6%))] lg:top-[11%] lg:w-[clamp(300px,25vw,380px)] lg:max-w-none lg:opacity-100">
-      <img src="/hero/hero-knight.webp" alt="" width="767" height="1100" decoding="async" fetchpriority="low" class="w-full animate-[float_16s_ease-in-out_infinite]" />
-    </div>
-    <div data-parallax="0.45" class="absolute -bottom-[16%] left-[53%] hidden lg:block">
+    <div data-parallax="0.45" class="absolute -bottom-[10%] right-[30%] hidden lg:block">
       <img src="/hero/hero-rook.webp" alt="" width="415" height="556" decoding="async" class="w-[clamp(170px,15vw,230px)] opacity-50" />
+    </div>
+    <div data-parallax="0.1" class="absolute -right-[8%] top-[6%] w-[46vw] max-w-[260px] opacity-25 sm:right-[5%] sm:opacity-35 lg:right-[max(2.5rem,calc((100vw-1400px)/2+2.5rem+3%))] lg:top-[12%] lg:w-[clamp(340px,30vw,470px)] lg:max-w-none lg:opacity-100">
+      <img src="/hero/hero-knight.webp" alt="" width="767" height="1100" decoding="async" fetchpriority="low" class="w-full animate-[float_16s_ease-in-out_infinite]" />
     </div>
   </div>
 
@@ -64,39 +61,6 @@ const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       </div>
     </div>
 
-    <div class="relative lg:col-span-5 lg:pl-6">
-      <div data-reveal="scale" style="--reveal-delay:420ms" class="relative mx-auto max-w-[420px]">
-        <div class="absolute -left-7 top-0 hidden h-full flex-col justify-around font-sans text-[0.6rem] tracking-widest text-mist/40 sm:flex" aria-hidden="true">
-          {[8, 7, 6, 5, 4, 3, 2, 1].map((n) => <span>{n}</span>)}
-        </div>
-
-        <div class="relative overflow-hidden rounded-panel border border-gold/25 p-2 shadow-[0_50px_120px_-40px_rgba(0,0,0,0.9)]">
-          <div id="live-board" class="relative grid aspect-square grid-cols-8 overflow-hidden rounded-card">
-            {Array.from({ length: 64 }).map((_, i) => {
-              const dark = (Math.floor(i / 8) + i) % 2 === 1;
-              return <span class:list={['square relative transition-[background-color,box-shadow] duration-700', dark ? 'bg-surface-2' : 'bg-surface']} />;
-            })}
-            <div class="pointer-events-none absolute inset-0 grid place-items-center">
-              <Piece type="knight" variant="solid" class="w-24 animate-[float_10s_ease-in-out_infinite] text-gold drop-shadow-[0_18px_40px_rgba(224,169,87,0.35)]" />
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3 flex justify-around font-sans text-[0.6rem] tracking-widest text-mist/40" aria-hidden="true">
-          {files.map((f) => <span>{f}</span>)}
-        </div>
-
-        <div data-reveal="right" style="--reveal-delay:900ms" class="absolute -bottom-6 -left-6 hidden items-center gap-4 rounded-card border border-gold/25 bg-navy/85 px-5 py-4 backdrop-blur-md sm:flex">
-          <SeedMark class="size-10 shrink-0" />
-          <div>
-            <p class="eyebrow text-[0.55rem]">Bote en juego</p>
-            <p class="mt-1 font-display text-2xl text-white">
-              <span data-count="1250" data-decimals="0">0</span><span class="text-gold"> Seeds</span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div class="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex" aria-hidden="true">
@@ -106,22 +70,3 @@ const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     </span>
   </div>
 </section>
-
-<script>
-  function initLiveBoard() {
-    const board = document.getElementById('live-board');
-    if (!board || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const squares = Array.from(board.querySelectorAll<HTMLElement>('.square'));
-    let timer: number;
-    const flash = () => {
-      const el = squares[Math.floor(Math.random() * squares.length)];
-      el.style.backgroundColor = 'rgba(224,169,87,0.24)';
-      el.style.boxShadow = 'inset 0 0 24px rgba(224,169,87,0.35)';
-      window.setTimeout(() => { el.style.backgroundColor = ''; el.style.boxShadow = ''; }, 900);
-      timer = window.setTimeout(flash, 420 + Math.random() * 700);
-    };
-    flash();
-    document.addEventListener('astro:before-swap', () => clearTimeout(timer), { once: true });
-  }
-  document.addEventListener('astro:page-load', initLiveBoard);
-</script>
