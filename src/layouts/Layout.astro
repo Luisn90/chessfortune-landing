@@ -49,6 +49,10 @@ const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site
       function initReveals() {
         const items = document.querySelectorAll<HTMLElement>('[data-reveal]:not(.is-in)');
         if (reduced) { items.forEach((el) => el.classList.add('is-in')); return; }
+        // Lo que está dentro de [data-reveal-instant] (el hero) entra al cargar,
+        // sin esperar a que cruce el margen inferior: el CTA nunca debe quedar oculto.
+        const instant = Array.from(items).filter((el) => el.closest('[data-reveal-instant]'));
+        requestAnimationFrame(() => requestAnimationFrame(() => instant.forEach((el) => el.classList.add('is-in'))));
         const io = new IntersectionObserver(
           (entries) => entries.forEach((e) => {
             if (!e.isIntersecting) return;
@@ -60,7 +64,7 @@ const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site
           // umbral mayor que 0 nunca dispararían y quedarían invisibles.
           { rootMargin: '0px 0px -12% 0px', threshold: 0 }
         );
-        items.forEach((el) => io.observe(el));
+        items.forEach((el) => { if (!el.closest('[data-reveal-instant]')) io.observe(el); });
       }
 
       function initCounters() {

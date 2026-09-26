@@ -1,0 +1,24 @@
+PEÓN DORADO CON CORTES DIAGONALES
+
+Reconstrucción 3D aproximada de la referencia proporcionada.
+Se ha interpretado el dibujo como un volumen de revolución, con seis
+secciones independientes separadas por cinco huecos diagonales.
+Los cortes atraviesan el volumen y tienen caras interiores cerradas.
+
+ARCHIVOS
+- peon-dorado.glb: modelo con material dorado PBR integrado.
+- peon-dorado.blend: escena editable de Blender, con cámara e iluminación.
+- peon-dorado.obj y peon-dorado.mtl: geometría y material de intercambio.
+  Mantener estos dos archivos juntos.
+- peon-dorado-preview.png: vista renderizada con fondo transparente.
+- create_pawn.py: fuente para reconstruir y modificar el modelo en Blender.
+
+USO
+Altura inicial: 100 mm. Coordenadas guardadas en metros.
+Cada sección tiene su propio centro de transformación, para desplazarla,
+girarla o animarla de forma independiente.
+El conjunto conserva los huecos del dibujo: las seis piezas están separadas.
+El material es editable y no necesita imágenes de textura externas.
+
+La profundidad y las caras ocultas se han reconstruido por simetría a partir
+de una única imagen; no es una reproducción dimensional certificada.

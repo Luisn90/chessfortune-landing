@@ -1,0 +1,198 @@
+---
+/**
+ * Peón dorado 3D (seis secciones con cortes diagonales).
+ * - Imagen de respaldo inmediata; Three.js se carga en tiempo libre del navegador.
+ * - Material matcap (sin PMREM/RoomEnvironment: nada de congelones al hacer scroll).
+ * - Se pausa fuera de pantalla o con la pestaña oculta. Respeta prefers-reduced-motion.
+ */
+interface Props { class?: string }
+const { class: cls = '' } = Astro.props;
+---
+
+<div data-pawn3d class:list={['pawn3d relative select-none', cls]}>
+  <div class="pointer-events-none absolute inset-x-[18%] bottom-[3%] h-[9%] rounded-[50%] bg-black/60 blur-2xl" aria-hidden="true"></div>
+  <img
+    src="/pawn/pawn-fallback.webp"
+    alt="Peón de ajedrez dorado dividido en secciones por cortes diagonales"
+    width="720" height="1000" decoding="async" fetchpriority="high"
+    class="pawn3d-fallback absolute inset-0 size-full object-contain transition-opacity duration-500"
+  />
+  <canvas class="pawn3d-canvas absolute inset-0 size-full opacity-0 transition-opacity duration-500" aria-hidden="true"></canvas>
+</div>
+
+<style>
+  .pawn3d { touch-action: pan-y; }
+  .pawn3d.is-live .pawn3d-canvas { opacity: 1; }
+  .pawn3d.is-live .pawn3d-fallback { opacity: 0; }
+  .pawn3d.is-live { cursor: grab; }
+  .pawn3d.is-dragging { cursor: grabbing; }
+</style>
+
+<script>
+  type W = Window & { __pawnCleanup?: () => void };
+
+  async function boot(host: HTMLElement) {
+    const [THREE, { GLTFLoader }, { MeshoptDecoder }] = await Promise.all([
+      import('three'),
+      import('three/examples/jsm/loaders/GLTFLoader.js'),
+      import('three/examples/jsm/libs/meshopt_decoder.module.js'),
+    ]);
+    if (!host.isConnected) return;
+
+    const canvas = host.querySelector<HTMLCanvasElement>('.pawn3d-canvas')!;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(24, 1, 0.1, 50);
+
+    const [matcap, gltf] = await Promise.all([
+      new THREE.TextureLoader().loadAsync('/pawn/matcap-gold.webp'),
+      new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync('/pawn/pawn.glb'),
+    ]);
+    if (!host.isConnected) { renderer.dispose(); return; }
+    matcap.colorSpace = THREE.SRGBColorSpace;
+    const material = new THREE.MeshMatcapMaterial({ matcap });
+
+    // Normalizar: altura 1, base en y=0
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const s = 1 / size.y;
+    model.scale.setScalar(s);
+    model.position.set(-(box.min.x + size.x / 2) * s, -box.min.y * s, -(box.min.z + size.z / 2) * s);
+
+    const pivot = new THREE.Group();   // inclinación + giro
+    pivot.add(model);
+    scene.add(pivot);
+
+    type Slice = { mesh: THREE.Mesh; base: THREE.Vector3; baseRotY: number; i: number };
+    const slices: Slice[] = [];
+    model.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (m.isMesh) { m.material = material; slices.push({ mesh: m, base: m.position.clone(), baseRotY: m.rotation.y, i: 0 }); }
+    });
+    slices.sort((a, b) => a.base.y - b.base.y).forEach((sl, i) => (sl.i = i));
+    const n = slices.length;
+
+    // Encuadre
+    const CY = 0.56;
+    const fit = () => {
+      const w = host.clientWidth, h = host.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      // encuadre con aire para la apertura: alto útil 1.3 (base→corona abierta), ancho útil 0.72·alto
+      const dist = 0.66 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * Math.max(1, 0.72 / camera.aspect);
+      const elev = THREE.MathUtils.degToRad(11);
+      camera.position.set(0, CY + Math.sin(elev) * dist, Math.cos(elev) * dist);
+      camera.lookAt(0, CY, 0);
+      camera.updateProjectionMatrix();
+    };
+    fit();
+
+    // Estado con amortiguación
+    const target = { rx: 0, ry: 0, spread: 0 };
+    const cur = { rx: 0, ry: 0, spread: 0 };
+    let spin = -0.5, spinVel = 0, hover = 0, scrollK = 0;
+    let dragging = false, lastX = 0;
+
+    const onMove = (e: PointerEvent) => {
+      if (!finePointer) return;
+      const r = host.getBoundingClientRect();
+      const nx = ((e.clientX - (r.left + r.width / 2)) / (window.innerWidth / 2));
+      const ny = ((e.clientY - (r.top + r.height / 2)) / (window.innerHeight / 2));
+      target.ry = THREE.MathUtils.clamp(nx, -1, 1) * 0.55;
+      target.rx = THREE.MathUtils.clamp(ny, -1, 1) * 0.16;
+      // proximidad al peón: 1 encima, 0 lejos
+      const d = Math.hypot((e.clientX - (r.left + r.width / 2)) / r.width, (e.clientY - (r.top + r.height / 2)) / r.height);
+      hover = THREE.MathUtils.clamp(1.25 - d * 1.9, 0, 1);
+    };
+    const onLeave = () => { target.rx = 0; target.ry = 0; hover = 0; };
+    const onScroll = () => {
+      const r = host.getBoundingClientRect();
+      scrollK = THREE.MathUtils.clamp(-r.top / (r.height * 0.9), 0, 1);
+    };
+    const onDown = (e: PointerEvent) => { dragging = true; lastX = e.clientX; host.classList.add('is-dragging'); host.setPointerCapture(e.pointerId); };
+    const onDrag = (e: PointerEvent) => { if (!dragging) return; const dx = e.clientX - lastX; lastX = e.clientX; spinVel = dx * 0.006; spin += spinVel; };
+    const onUp = () => { dragging = false; host.classList.remove('is-dragging'); };
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onLeave);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    host.addEventListener('pointerdown', onDown);
+    host.addEventListener('pointermove', onDrag);
+    host.addEventListener('pointerup', onUp);
+    host.addEventListener('pointercancel', onUp);
+    onScroll();
+
+    const ro = new ResizeObserver(fit); ro.observe(host);
+
+    let visible = true, raf = 0, last = performance.now(), t = 0;
+    const damp = (a: number, b: number, k: number, dt: number) => a + (b - a) * (1 - Math.exp(-k * dt));
+
+    const apply = () => {
+      pivot.rotation.set(cur.rx, spin + cur.ry, 0);
+      pivot.position.y = Math.sin(t * 0.9) * 0.012;
+      const sp = cur.spread;
+      for (const sl of slices) {
+        const k = sl.i / (n - 1);           // 0 base … 1 corona
+        sl.mesh.position.set(sl.base.x, sl.base.y + sp * k * 0.12 / model.scale.y, sl.base.z);
+        sl.mesh.rotation.y = sl.baseRotY + sp * (k - 0.2) * 0.7;   // apertura en espiral
+      }
+    };
+
+    const frame = (now: number) => {
+      raf = 0;
+      const dt = Math.min((now - last) / 1000, 0.05); last = now; t += dt;
+      if (!dragging) { spinVel *= Math.pow(0.04, dt); spin += spinVel + dt * 0.14; }
+      const breathe = finePointer ? 0 : (Math.sin(t * 0.7) * 0.5 + 0.5) * 0.55;
+      target.spread = Math.min(1.1, Math.max(hover, breathe) + scrollK * 0.8);
+      cur.rx = damp(cur.rx, target.rx, 4, dt);
+      cur.ry = damp(cur.ry, target.ry, 4, dt);
+      cur.spread = damp(cur.spread, target.spread, 3.2, dt);
+      apply();
+      renderer.render(scene, camera);
+      if (visible && !document.hidden) raf = requestAnimationFrame(frame);
+    };
+    const play = () => { if (!raf && visible && !document.hidden && !reduced) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; play(); }, { threshold: 0 });
+    io.observe(host);
+    const onVis = () => play();
+    document.addEventListener('visibilitychange', onVis);
+
+    // primer fotograma y fundido desde la imagen de respaldo
+    apply(); renderer.render(scene, camera);
+    requestAnimationFrame(() => host.classList.add('is-live'));
+    if (reduced) { const rr = () => renderer.render(scene, camera); new ResizeObserver(rr).observe(host); }
+    play();
+
+    (window as W).__pawnCleanup = () => {
+      cancelAnimationFrame(raf); io.disconnect(); ro.disconnect();
+      window.removeEventListener('pointermove', onMove);
+      document.documentElement.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('visibilitychange', onVis);
+      model.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) m.geometry.dispose(); });
+      material.dispose(); matcap.dispose(); renderer.dispose();
+      (window as W).__pawnCleanup = undefined;
+    };
+  }
+
+  function initPawn() {
+    const host = document.querySelector<HTMLElement>('[data-pawn3d]');
+    if (!host || host.dataset.booted) return;
+    host.dataset.booted = '1';
+    const go = () => boot(host).catch((err) => console.warn('[pawn3d]', err));
+    if ('requestIdleCallback' in window) (window as any).requestIdleCallback(go, { timeout: 1200 });
+    else setTimeout(go, 300);
+  }
+
+  document.addEventListener('astro:page-load', initPawn);
+  document.addEventListener('astro:before-swap', () => (window as W).__pawnCleanup?.());
+</script>
