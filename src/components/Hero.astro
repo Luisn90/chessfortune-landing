@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+import PlayStoreButton from './PlayStoreButton.astro';
 
 const lines = [
   { text: '¡Juega al ajedrez', accent: false },
@@ -48,7 +49,7 @@ const pieces = [
 
       <h1 id="hero-title" class="text-[clamp(2.3rem,4.7vw,4.3rem)]">
         {lines.map((line, i) => (
-          <span class="block overflow-hidden pb-[0.06em] sm:whitespace-nowrap">
+          <span class="-mb-[0.2em] block overflow-hidden pb-[0.2em] sm:whitespace-nowrap">
             <span data-reveal="mask" style={`--reveal-delay:${120 + i * 110}ms`} class:list={['block', line.accent && 'text-gilded']}>
               {line.text}
             </span>
@@ -61,10 +62,7 @@ const pieces = [
       </p>
 
       <div data-reveal="up" style="--reveal-delay:760ms" class="mt-7 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:mt-11">
-        <a href={site.playStore} target="_blank" rel="noopener" class="btn-gold inline-flex items-center gap-3 px-9 py-4 font-sans text-[0.76rem] font-medium uppercase tracking-[0.22em] text-navy">
-          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-          Descarga la app
-        </a>
+        <PlayStoreButton class="px-9 py-4 text-[0.76rem] tracking-[0.22em]" />
         <a href={site.discord} rel="noopener" class="btn-ghost border border-line px-8 py-4 font-sans text-[0.76rem] uppercase tracking-[0.22em] text-ivory">Únete al Discord</a>
       </div>
   </div>

@@ -1,0 +1,22 @@
+---
+/**
+ * CTA a Google Play. Úsalo en cualquier botón que lleve a la tienda:
+ * incluye siempre el icono oficial (Simple Icons) y el enlace de site.playStore.
+ */
+import { siGoogleplay } from 'simple-icons';
+import { site } from '../data/site';
+
+interface Props { label?: string; class?: string }
+const { label = 'Descarga la app', class: cls = '' } = Astro.props;
+---
+
+<a
+  href={site.playStore}
+  target="_blank"
+  rel="noopener"
+  class:list={['btn-gold inline-flex items-center gap-3 font-sans font-medium uppercase text-navy', cls]}
+  aria-label={`${label} en Google Play`}
+>
+  <svg class="size-[1.15em] shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={siGoogleplay.path} /></svg>
+  <span>{label}</span>
+</a>

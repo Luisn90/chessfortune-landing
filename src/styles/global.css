@@ -101,6 +101,9 @@
   background-clip: text;
   color: transparent;
   animation: gild 9s linear infinite;
+  /* el fondo recortado al texto debe cubrir los descendentes (g, j, p, q, y) */
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
 }
 
 @utility eyebrow {
@@ -142,6 +145,8 @@
 [data-reveal='mask']  { clip-path: inset(0 0 105% 0); transform: translate3d(0, 24px, 0); }
 [data-reveal='wipe']  { clip-path: inset(0 100% 0 0); }
 [data-reveal].is-in   { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0); }
+/* Con interlineado 0.94 los descendentes y acentos salen de la caja: el recorte final se abre hacia fuera */
+[data-reveal='mask'].is-in { clip-path: inset(-0.35em -0.25em -0.35em -0.25em); }
 
 /* ══════════════════ MICRO-INTERACCIONES ══════════════════ */
 @utility link-underline { position: relative; }
