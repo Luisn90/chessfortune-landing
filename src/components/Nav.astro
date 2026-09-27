@@ -2,6 +2,7 @@
 import { nav, site } from '../data/site';
 const path = Astro.url.pathname;
 const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+import PlayStoreButton from './PlayStoreButton.astro';
 ---
 
 <header id="site-nav" transition:persist class="fixed inset-x-0 top-0 z-70 py-4">
@@ -35,12 +36,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
       </nav>
 
       <div class="flex items-center gap-3">
-        <a href={site.login} class="btn-ghost hidden whitespace-nowrap border border-line px-5 py-3 font-sans text-[0.7rem] uppercase tracking-[0.2em] text-ivory lg:block">
-          Iniciar sesión
-        </a>
-        <a href={site.register} class="btn-gold hidden whitespace-nowrap px-5 py-3 font-sans text-[0.7rem] font-medium uppercase tracking-[0.2em] text-navy sm:block">
-          Registrarse
-        </a>
+        <PlayStoreButton class="hidden whitespace-nowrap px-5 py-3 text-[0.7rem] tracking-[0.2em] sm:inline-flex" />
         <button
           id="menu-btn"
           type="button"
@@ -86,9 +82,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
           </a>
         ))
       }
-      <div class="menu-link mt-8 flex translate-y-6 flex-wrap gap-3 opacity-0 transition-all duration-600" style="transition-delay:640ms">
-        <a href={site.register} class="btn-gold px-7 py-3.5 text-[0.72rem] uppercase tracking-[0.2em] text-navy">Registrarse</a>
-        <a href={site.login} class="btn-ghost border border-line px-7 py-3.5 text-[0.72rem] uppercase tracking-[0.2em] text-ivory">Iniciar sesión</a>
+      <div class="menu-link mt-8 translate-y-6 opacity-0 transition-all duration-600" style="transition-delay:640ms">
+        <PlayStoreButton class="px-7 py-3.5 text-[0.72rem] tracking-[0.2em]" />
       </div>
     </nav>
   </div>
