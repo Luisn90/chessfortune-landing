@@ -1,0 +1,136 @@
+---
+/**
+ * Aviso de cookies (parte inferior).
+ * Guarda la elección en localStorage ('cf-consent') y la publica en:
+ *   window.cfConsent            → { v, necessary, analytics, marketing, date } | null
+ *   evento 'cf:consent' (window) → detail con el mismo objeto
+ * Dev: cargar analítica/marketing solo si cfConsent.analytics / .marketing es true.
+ * Cualquier elemento con [data-cookie-settings] reabre el panel.
+ */
+import { content } from '../i18n/content';
+import { getLang, localize } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const t = content[lang].cookies;
+---
+
+<div id="cookie-banner" transition:persist="cookie-banner" class="pointer-events-none fixed inset-x-0 bottom-0 z-[90] p-3 sm:p-5" hidden>
+  <div
+    role="dialog"
+    aria-modal="false"
+    aria-labelledby="cookie-title"
+    class="cookie-card pointer-events-auto mx-auto w-full max-w-[560px] rounded-card border border-line bg-surface/95 p-6 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl sm:ml-0 sm:p-7"
+  >
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="eyebrow mb-3 text-[0.58rem]">{t.eyebrow}</p>
+        <h2 id="cookie-title" class="font-display text-2xl text-white">{t.title}</h2>
+      </div>
+      <button type="button" data-cookie-close aria-label={t.close} class="-mr-1 -mt-1 grid size-9 shrink-0 place-items-center rounded-full text-mist transition-colors hover:bg-white/5 hover:text-white">
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </div>
+    <p class="mt-3 text-sm leading-relaxed text-mist">
+      {t.body}
+      <a href={localize('/cookies', lang)} class="link-underline ml-1 text-gold">{t.policy}</a>
+    </p>
+
+    <!-- Preferencias (ocultas hasta pulsar Configurar) -->
+    <div data-cookie-prefs class="mt-5 space-y-2.5" hidden>
+      {t.categories.map((cat) => (
+        <label class="flex cursor-pointer items-start justify-between gap-5 rounded-2xl border border-line/70 bg-navy/40 p-4">
+          <span>
+            <span class="block text-sm text-white">{cat.title}</span>
+            <span class="mt-1 block text-xs leading-relaxed text-mist">{cat.body}</span>
+          </span>
+          {cat.key === 'necessary' ? (
+            <span class="mt-0.5 shrink-0 font-sans text-[0.58rem] uppercase tracking-[0.16em] text-gold/80">{t.alwaysOn}</span>
+          ) : (
+            <span class="relative mt-0.5 shrink-0">
+              <input type="checkbox" data-cookie-cat={cat.key} class="peer sr-only" />
+              <span class="block h-6 w-11 rounded-full border border-line bg-navy transition-colors peer-checked:border-gold/60 peer-checked:bg-gold/25 peer-focus-visible:ring-2 peer-focus-visible:ring-gold/60"></span>
+              <span class="absolute left-1 top-1 size-4 rounded-full bg-mist transition-all peer-checked:translate-x-5 peer-checked:bg-gold"></span>
+            </span>
+          )}
+        </label>
+      ))}
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-2.5">
+      <button type="button" data-cookie-accept class="btn-gold px-5 py-3 font-sans text-[0.66rem] font-medium uppercase tracking-[0.18em] text-navy">{t.acceptAll}</button>
+      <button type="button" data-cookie-necessary class="btn-ghost border border-line px-5 py-3 font-sans text-[0.66rem] uppercase tracking-[0.18em] text-ivory">{t.necessaryOnly}</button>
+      <button type="button" data-cookie-configure class="px-3 py-3 font-sans text-[0.66rem] uppercase tracking-[0.18em] text-mist underline-offset-4 transition-colors hover:text-white hover:underline">{t.configure}</button>
+      <button type="button" data-cookie-save class="btn-gold px-5 py-3 font-sans text-[0.66rem] font-medium uppercase tracking-[0.18em] text-navy" hidden>{t.save}</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  #cookie-banner .cookie-card { transform: translateY(24px); opacity: 0; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; }
+  #cookie-banner.is-open .cookie-card { transform: none; opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { #cookie-banner .cookie-card { transition: none; } }
+</style>
+
+<script>
+  type Consent = { v: 1; necessary: true; analytics: boolean; marketing: boolean; date: string };
+  type W = Window & { cfConsent?: Consent | null; __cfCookieBound?: boolean };
+  const KEY = 'cf-consent';
+
+  const read = (): Consent | null => {
+    try { const c = JSON.parse(localStorage.getItem(KEY) || 'null'); return c && c.v === 1 ? c : null; } catch { return null; }
+  };
+
+  function initCookies() {
+    const w = window as W;
+    const root = document.getElementById('cookie-banner');
+    if (!root) return;
+    w.cfConsent = read();
+
+    // Botón "Configurar cookies" del footer (se re-renderiza en cada página)
+    document.querySelectorAll<HTMLElement>('[data-cookie-settings]').forEach((b) => {
+      if (b.dataset.bound) return; b.dataset.bound = '1';
+      b.addEventListener('click', (e) => { e.preventDefault(); open(true); });
+    });
+
+    if (w.__cfCookieBound) return; // el banner persiste entre páginas: enlazar una sola vez
+    w.__cfCookieBound = true;
+
+    const prefs = root.querySelector<HTMLElement>('[data-cookie-prefs]')!;
+    const save = root.querySelector<HTMLElement>('[data-cookie-save]')!;
+    const configure = root.querySelector<HTMLElement>('[data-cookie-configure]')!;
+    const boxes = Array.from(root.querySelectorAll<HTMLInputElement>('[data-cookie-cat]'));
+
+    function open(withPrefs = false) {
+      const c = read();
+      boxes.forEach((b) => (b.checked = !!(c && (c as any)[b.dataset.cookieCat!])));
+      prefs.hidden = !withPrefs; save.hidden = !withPrefs; configure.hidden = withPrefs;
+      root!.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => root!.classList.add('is-open')));
+    }
+    function close() {
+      root!.classList.remove('is-open');
+      setTimeout(() => { if (!root!.classList.contains('is-open')) root!.hidden = true; }, 450);
+    }
+    function store(analytics: boolean, marketing: boolean) {
+      const c: Consent = { v: 1, necessary: true, analytics, marketing, date: new Date().toISOString() };
+      try { localStorage.setItem(KEY, JSON.stringify(c)); } catch {}
+      w.cfConsent = c;
+      window.dispatchEvent(new CustomEvent('cf:consent', { detail: c }));
+      close();
+    }
+    (window as any).__cfOpenCookies = open;
+
+    root.querySelector('[data-cookie-accept]')!.addEventListener('click', () => store(true, true));
+    root.querySelector('[data-cookie-necessary]')!.addEventListener('click', () => store(false, false));
+    // Cerrar sin elegir = solo necesarias (no se activa nada sin consentimiento)
+    root.querySelector('[data-cookie-close]')!.addEventListener('click', () => (read() ? close() : store(false, false)));
+    configure.addEventListener('click', () => { prefs.hidden = false; save.hidden = false; configure.hidden = true; });
+    save.addEventListener('click', () => {
+      const get = (k: string) => !!boxes.find((b) => b.dataset.cookieCat === k)?.checked;
+      store(get('analytics'), get('marketing'));
+    });
+
+    if (!w.cfConsent) setTimeout(() => open(false), 900);
+  }
+  function open(withPrefs: boolean) { (window as any).__cfOpenCookies?.(withPrefs); }
+  document.addEventListener('astro:page-load', initCookies);
+</script>

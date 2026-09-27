@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { content } from '../i18n/content';
+import { getLang } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const t = content[lang].pages.cookies;
+const c = content[lang].cookies;
+---
+
+<Layout title={t.title} description={t.description}>
+  <PageHeader eyebrow={t.eyebrow} title={t.heading} accent={t.accent} lead={t.lead} />
+  <section class="pb-24 pt-4 lg:pb-36">
+    <div class="mx-auto max-w-[900px] px-6 lg:px-10">
+      <div class="divide-y divide-line/60 rounded-card border border-line/60 bg-surface/25">
+        {t.sections.map((s, i) => (
+          <div data-reveal="up" class="grid gap-3 p-6 sm:grid-cols-[3rem_1fr] sm:gap-6 lg:p-8">
+            <span class="font-sans text-sm tabular-nums tracking-[0.12em] text-gold">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h2 class="text-lg text-white">{s.h}</h2>
+              <p class="mt-3 text-[0.95rem] leading-relaxed text-mist">{s.p}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <button type="button" data-cookie-settings class="btn-ghost mt-10 border border-line px-7 py-3.5 font-sans text-[0.7rem] uppercase tracking-[0.2em] text-ivory">{c.settings}</button>
+    </div>
+  </section>
+</Layout>
