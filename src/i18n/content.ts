@@ -190,15 +190,7 @@ const es = {
       eyebrow: 'Legal',
       heading: 'Términos y',
       accent: 'condiciones.',
-      lead: 'Última actualización: julio de 2026. Este texto es una plantilla de referencia y debe ser revisado por asesoría legal antes de publicarse.',
-      sections: [
-        { h: '1. Objeto', p: 'Estas condiciones regulan el acceso y uso de la plataforma Chess Fortune, incluidos el juego de ajedrez en línea, el sistema de Seeds y los servicios asociados.' },
-        { h: '2. Requisitos de acceso', p: 'El uso de tableros con Seeds está reservado a personas mayores de 18 años con capacidad legal para contratar. Las salas de práctica gratuitas admiten usuarios desde los 16 años con consentimiento de su tutor legal.' },
-        { h: '3. Naturaleza de las Seeds', p: 'Las Seeds son una moneda de uso interno de la plataforma. No constituyen dinero electrónico, valor negociable ni criptoactivo, y su canje está sujeto a verificación de identidad y a la normativa aplicable en el país de residencia del usuario.' },
-        { h: '4. Juego limpio', p: 'Queda prohibido el uso de motores de análisis, asistencia externa, cuentas múltiples o cualquier práctica dirigida a alterar el resultado de una partida. El incumplimiento conlleva la pérdida del bote en disputa y la suspensión de la cuenta.' },
-        { h: '5. Retiros', p: 'Las solicitudes de retiro se procesan en un plazo de 24 a 72 horas hábiles tras la verificación de identidad. Chess Fortune podrá retener temporalmente un retiro si existen indicios razonables de fraude.' },
-        { h: '6. Responsabilidad', p: 'Chess Fortune no responde de interrupciones derivadas de la conexión del usuario. El reloj de partida se gestiona en servidor precisamente para minimizar el impacto de estas incidencias.' },
-      ],
+      lead: 'Léelos con atención antes de registrarte. Estos términos pueden cambiar sin previo aviso.',
     },
   },
 };
@@ -392,15 +384,7 @@ const en: Content = {
       eyebrow: 'Legal',
       heading: 'Terms and',
       accent: 'conditions.',
-      lead: 'Last updated: July 2026. This text is a reference template and must be reviewed by legal counsel before publication.',
-      sections: [
-        { h: '1. Purpose', p: 'These terms govern access to and use of the Chess Fortune platform, including online chess, the Seeds system and related services.' },
-        { h: '2. Access requirements', p: 'Boards with Seeds are reserved for people over 18 with the legal capacity to enter into contracts. Free practice rooms accept users from age 16 with the consent of their legal guardian.' },
-        { h: '3. Nature of Seeds', p: 'Seeds are a currency for use within the platform. They are not electronic money, a tradable security or a crypto-asset, and redeeming them is subject to identity verification and to the regulations applicable in the user’s country of residence.' },
-        { h: '4. Fair play', p: 'The use of analysis engines, outside assistance, multiple accounts or any practice intended to alter the outcome of a game is prohibited. Breaches result in the loss of the pot at stake and suspension of the account.' },
-        { h: '5. Withdrawals', p: 'Withdrawal requests are processed within 24 to 72 business hours after identity verification. Chess Fortune may temporarily hold a withdrawal where there are reasonable grounds to suspect fraud.' },
-        { h: '6. Liability', p: 'Chess Fortune is not liable for interruptions caused by the user’s connection. The game clock is managed on the server precisely to minimise the impact of such incidents.' },
-      ],
+      lead: 'Please read them carefully before registering. This is a good-faith translation: in case of doubt, the Spanish version prevails (see 1.2).',
     },
   },
 };

@@ -2,24 +2,96 @@
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { content } from '../i18n/content';
+import { terms } from '../i18n/terms';
 import { getLang } from '../i18n';
 const lang = getLang(Astro.currentLocale);
-
 const t = content[lang].pages.terminos;
-const sections = t.sections;
+const doc = terms[lang];
 ---
 
 <Layout title={t.title} description={t.description}>
   <PageHeader eyebrow={t.eyebrow} title={t.heading} accent={t.accent} lead={t.lead} />
 
-  <section class="py-20 lg:py-28">
-    <div class="mx-auto max-w-3xl space-y-4 px-6 lg:px-10">
-      {sections.map((s, i) => (
-        <article data-reveal="up" style={`--reveal-delay:${i * 60}ms`} class="rounded-card border border-line/60 bg-surface/25 p-8 lg:p-10">
-          <h2 class="text-xl text-white">{s.h}</h2>
-          <p class="mt-4 leading-relaxed text-mist">{s.p}</p>
-        </article>
-      ))}
+  <section class="pb-24 pt-4 lg:pb-36">
+    <div class="mx-auto grid max-w-[1400px] gap-12 px-6 lg:grid-cols-12 lg:gap-16 lg:px-10">
+      <!-- Índice: fijo en escritorio -->
+      <aside class="hidden lg:col-span-4 lg:block xl:col-span-3">
+        <nav class="sticky top-28" aria-label={doc.tocTitle}>
+          <p class="eyebrow mb-6 text-[0.58rem]">{doc.tocTitle}</p>
+          <ol class="space-y-1 border-l border-line">
+            {doc.sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`} data-toc={s.id} class="toc-link -ml-px block border-l border-transparent py-2 pl-5 text-sm text-mist transition-colors duration-300 hover:text-white">
+                  {s.title}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </aside>
+
+      <div class="min-w-0 lg:col-span-8 xl:col-span-8 xl:col-start-5">
+        <div data-reveal="up" class="rounded-card border border-gold/30 bg-gold/[0.04] p-7 lg:p-9">
+          <p class="eyebrow mb-4 text-[0.6rem]">{doc.important}</p>
+          <p class="leading-relaxed text-ivory/90">{doc.intro}</p>
+        </div>
+
+        {doc.sections.map((s) => (
+          <article id={s.id} class="scroll-mt-28 pt-16 lg:pt-20">
+            <h2 data-reveal="up" class="font-display text-[clamp(1.7rem,3vw,2.4rem)] text-white">{s.title}</h2>
+            <span class="mt-5 block h-px w-16 rounded-full bg-gold/60" aria-hidden="true" />
+            {s.intro && <p class="mt-7 leading-relaxed text-mist">{s.intro}</p>}
+
+            {s.items.length > 0 && (
+              <div class="mt-8 divide-y divide-line/60 rounded-card border border-line/60 bg-surface/25">
+                {s.items.map((it) => (
+                  <div class="grid gap-3 p-6 sm:grid-cols-[3.5rem_1fr] sm:gap-6 lg:p-8">
+                    <span class="font-sans text-sm tabular-nums tracking-[0.12em] text-gold">{it.n}</span>
+                    <div class="min-w-0">
+                      <h3 class="text-lg text-white">{it.t}</h3>
+                      <p class="mt-3 text-[0.95rem] leading-relaxed text-mist">{it.p}</p>
+                      {it.list && (
+                        <ul class="mt-4 space-y-3">
+                          {it.list.map((li, k) => (
+                            <li class="flex gap-4 text-[0.95rem] leading-relaxed text-mist">
+                              <span class="mt-[0.1rem] shrink-0 font-sans text-xs text-gold/70">{String.fromCharCode(97 + k)})</span>
+                              <span>{li}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
     </div>
   </section>
+
+  <style>
+    .toc-link[aria-current='true'] { color: var(--color-gold); border-color: var(--color-gold); }
+  </style>
+
+  <script>
+    // Resalta en el índice la sección visible
+    function initToc() {
+      const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc]'));
+      if (!links.length) return;
+      const byId = new Map(links.map((l) => [l.dataset.toc!, l]));
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          links.forEach((l) => l.removeAttribute('aria-current'));
+          byId.get(e.target.id)?.setAttribute('aria-current', 'true');
+        }),
+        { rootMargin: '-30% 0px -60% 0px' }
+      );
+      byId.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+      document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+    }
+    document.addEventListener('astro:page-load', initToc);
+  </script>
 </Layout>
