@@ -1,0 +1,82 @@
+---
+import { roadmap } from '../data/site';
+import PlayStoreButton from './PlayStoreButton.astro';
+---
+
+<section id="roadmap" class="py-24 lg:py-36" aria-labelledby="roadmap-title">
+  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
+    <hr class="rule rule-fade mb-24 lg:mb-32" />
+
+    <div class="mb-16 flex flex-wrap items-end justify-between gap-8 lg:mb-20">
+      <div>
+        <p data-reveal="wipe" class="eyebrow mb-5">Roadmap</p>
+        <h2 id="roadmap-title" data-reveal="mask" style="--reveal-delay:90ms" class="max-w-4xl text-[length:var(--text-display)]">
+          Primer movimiento hecho.<br /> Vamos a por el <span class="text-gilded">siguiente</span>.
+        </h2>
+      </div>
+      <p data-reveal="up" style="--reveal-delay:200ms" class="max-w-xs text-sm text-mist">Así avanza Chess Fortune. Te contamos cada paso antes de darlo.</p>
+    </div>
+
+    <ol class="relative grid gap-5 lg:grid-cols-3 lg:gap-6">
+      <!-- línea de tiempo: vertical en móvil, horizontal en escritorio -->
+      <span class="pointer-events-none absolute bottom-6 left-[1.4rem] top-6 w-px bg-gradient-to-b from-gold/60 via-line to-transparent lg:hidden" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute left-8 right-0 top-[0.875rem] hidden h-px bg-gradient-to-r from-gold/60 via-gold/25 via-45% to-transparent lg:block" aria-hidden="true"></span>
+
+      {roadmap.map((m, i) => (
+        <li
+          data-reveal="up"
+          style={`--reveal-delay:${i * 110}ms`}
+          class:list={[
+            'relative flex flex-col pl-14 lg:pl-0',
+            m.status === 'later' && 'opacity-60',
+          ]}
+        >
+          <!-- nodo -->
+          <span
+            class:list={[
+              'absolute left-[0.6rem] top-5 grid size-7 place-items-center rounded-full border lg:static lg:mb-7 lg:ml-5',
+              m.status === 'done' && 'border-gold bg-gold text-navy',
+              m.status === 'next' && 'roadmap-pulse border-gold/70 bg-navy text-gold',
+              m.status === 'later' && 'border-line bg-navy text-mist',
+            ]}
+            aria-hidden="true"
+          >
+            {m.status === 'done'
+              ? <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7" /></svg>
+              : <span class:list={['size-2 rounded-full', m.status === 'next' ? 'bg-gold' : 'bg-line']}></span>}
+          </span>
+
+          <article
+            class:list={[
+              'flex-1 rounded-card border p-7 lg:p-8',
+              m.status === 'done' && 'border-gold/35 bg-surface/70',
+              m.status === 'next' && 'border-line bg-surface/40',
+              m.status === 'later' && 'border-dashed border-line bg-transparent',
+            ]}
+          >
+            <div class="flex flex-wrap items-center gap-3">
+              <span class:list={['eyebrow text-[0.6rem]', m.status !== 'done' && 'text-mist']}>{m.date}</span>
+              {m.status === 'done' && <span class="rounded-chip border border-gold/30 bg-gold/10 px-2.5 py-1 font-sans text-[0.58rem] uppercase tracking-[0.2em] text-gold">Completado</span>}
+              {m.status === 'next' && <span class="rounded-chip border border-line px-2.5 py-1 font-sans text-[0.58rem] uppercase tracking-[0.2em] text-ivory">Fecha por anunciar</span>}
+            </div>
+            <h3 class="mt-5 font-display text-3xl text-white lg:text-[2.1rem]">{m.title}</h3>
+            <p class="mt-4 text-sm leading-relaxed text-mist">{m.body}</p>
+            {m.status === 'done' && (
+              <PlayStoreButton class="mt-7 px-6 py-3 text-[0.68rem] tracking-[0.2em]" />
+            )}
+          </article>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .roadmap-pulse { box-shadow: 0 0 0 0 rgba(224, 169, 87, 0.45); animation: roadmap-pulse 2.4s ease-out infinite; }
+  @keyframes roadmap-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(224, 169, 87, 0.45); }
+    70%  { box-shadow: 0 0 0 12px rgba(224, 169, 87, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(224, 169, 87, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .roadmap-pulse { animation: none; } }
+</style>

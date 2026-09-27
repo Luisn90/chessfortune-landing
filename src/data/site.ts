@@ -47,11 +47,25 @@ export const seedsFlow = [
   { step: 'Retira', title: 'A tu billetera', body: 'Canjea tus Seeds y transfiérelas a tu billetera digital. Verificación previa, proceso auditado.' },
 ];
 
-export const modes = [
-  { name: 'Bullet', time: '1 + 0', desc: 'Instinto puro. Un minuto y sin incremento.', heat: 'Extremo' },
-  { name: 'Blitz', time: '5 + 3', desc: 'El formato estrella de la sala global.', heat: 'Alto' },
-  { name: 'Rápidas', time: '10 + 5', desc: 'Espacio para calcular sin dormirse.', heat: 'Medio' },
-  { name: 'Clásicas', time: '30 + 20', desc: 'Ajedrez de verdad, con botes grandes.', heat: 'Estratégico' },
+export const roadmap = [
+  {
+    status: 'done',
+    date: '20 sep 2026',
+    title: 'Lanzamiento de la app',
+    body: 'Chess Fortune ya está disponible en Google Play. Crea tu cuenta, recibe tus primeras Seeds y juega tus primeras partidas.',
+  },
+  {
+    status: 'next',
+    date: 'Próxima meta',
+    title: 'Evento de prueba',
+    body: 'Un evento abierto a la comunidad para poner a prueba todas las funciones: salas, botes de Seeds, ritmos de juego y ranking.',
+  },
+  {
+    status: 'later',
+    date: 'Después',
+    title: 'Más por venir',
+    body: 'Lo que construyamos después lo decidiremos con lo que aprendamos del evento de prueba y con vuestro feedback.',
+  },
 ];
 
 export const pillars = [
