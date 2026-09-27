@@ -20,7 +20,7 @@ const pieces = [
 ];
 ---
 
-<section data-reveal-instant data-hero-depth class="relative flex min-h-[100svh] items-center overflow-hidden pb-20 pt-28 lg:pb-24 lg:pt-32" aria-labelledby="hero-title">
+<section data-reveal-instant data-depth-root class="relative flex min-h-[100svh] items-center overflow-hidden pb-20 pt-28 lg:pb-24 lg:pt-32" aria-labelledby="hero-title">
   <div class="pointer-events-none absolute inset-0" aria-hidden="true">
     <div class="absolute left-1/2 top-1/2 size-[min(90vw,1000px)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50" style="background: radial-gradient(closest-side, rgba(224,169,87,0.14), rgba(224,169,87,0.04) 40%, transparent 70%)"></div>
   </div>
@@ -75,25 +75,5 @@ const pieces = [
 </section>
 
 <script>
-  // Profundidad con el ratón: cada capa se desplaza según su data-depth (solo puntero fino).
-  function initHeroDepth() {
-    const root = document.querySelector<HTMLElement>('[data-hero-depth]');
-    if (!root || root.dataset.depthBound) return;
-    root.dataset.depthBound = '1';
-    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const layers = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]')).map((el) => ({ el, d: parseFloat(el.dataset.depth || '0') }));
-    let tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
-    const loop = () => {
-      cx += (tx - cx) * 0.06; cy += (ty - cy) * 0.06;
-      for (const l of layers) l.el.style.transform = `translate3d(${(cx * l.d).toFixed(2)}px, ${(cy * l.d).toFixed(2)}px, 0)`;
-      raf = Math.abs(tx - cx) + Math.abs(ty - cy) > 0.0015 ? requestAnimationFrame(loop) : 0;
-    };
-    const onMove = (e: PointerEvent) => {
-      tx = (e.clientX / innerWidth) * 2 - 1; ty = (e.clientY / innerHeight) * 2 - 1;
-      if (!raf) raf = requestAnimationFrame(loop);
-    };
-    window.addEventListener('pointermove', onMove, { passive: true });
-    document.addEventListener('astro:before-swap', () => { window.removeEventListener('pointermove', onMove); cancelAnimationFrame(raf); }, { once: true });
-  }
-  document.addEventListener('astro:page-load', initHeroDepth);
+  import '../scripts/depth';
 </script>

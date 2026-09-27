@@ -80,6 +80,13 @@ const es = {
       { step: 'Guarda', title: 'En tu balance', body: 'Reinviértelas en mesas más altas, compra cosméticos de tablero o desbloquea torneos privados.' },
       { step: 'Retira', title: 'A tu billetera', body: 'Canjea tus Seeds y retíralas en USDT. Verificación previa, proceso auditado.' },
     ],
+    // Pantallas del móvil (placeholders). Para usar capturas reales, añade src: '/seeds/captura-1.webp'
+    screens: [
+      { key: 'game', tag: 'Partida en curso', pot: 'Bote', you: 'Tú', rival: 'Rival', clockYou: '02:41', clockRival: '03:05' },
+      { key: 'wallet', tag: 'Billetera', balance: 'Saldo disponible', approx: '≈ 1.250 USD', rows: [['Victoria vs. @rival', '+20'], ['Entrada a sala', '−10'], ['Depósito', '+50']] },
+      { key: 'withdraw', tag: 'Retiro', amount: 'Cantidad', method: 'Recibes en', eta: 'Máx. 36 h hábiles', cta: 'Retirar' },
+    ],
+    screenAria: 'Pantalla',
   },
   roadmap: {
     eyebrow: 'Roadmap',
@@ -266,6 +273,12 @@ const en: Content = {
       { step: 'Keep', title: 'In your balance', body: 'Reinvest them at higher tables, buy board cosmetics or unlock private tournaments.' },
       { step: 'Withdraw', title: 'To your wallet', body: 'Redeem your Seeds and withdraw them in USDT. Prior verification, audited process.' },
     ],
+    screens: [
+      { key: 'game', tag: 'Game in progress', pot: 'Pot', you: 'You', rival: 'Rival', clockYou: '02:41', clockRival: '03:05' },
+      { key: 'wallet', tag: 'Wallet', balance: 'Available balance', approx: '≈ 1,250 USD', rows: [['Win vs. @rival', '+20'], ['Room entry', '−10'], ['Deposit', '+50']] },
+      { key: 'withdraw', tag: 'Withdrawal', amount: 'Amount', method: 'You receive', eta: 'Max. 36 business hours', cta: 'Withdraw' },
+    ],
+    screenAria: 'Screen',
   },
   roadmap: {
     eyebrow: 'Roadmap',
