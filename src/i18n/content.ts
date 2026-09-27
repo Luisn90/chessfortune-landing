@@ -5,9 +5,10 @@
 
 const es = {
   meta: {
-    tagline: 'Juega al ajedrez. Conquista el mundo.',
+    tagline: 'Ajedrez online con premios en Seeds',
     description:
-      'Plataforma de ajedrez en línea donde cada partida se juega por Seeds, la moneda del juego. Crea tu tablero, elige tus reglas y compite contra el mundo.',
+      'Juega al ajedrez online contra rivales de todo el mundo y gana Seeds en cada partida. Crea tu tablero, pon tus reglas y descarga la app gratis en Google Play.',
+    ogAlt: 'Chess Fortune: ¡Juega al ajedrez y conquista el mundo!',
     skip: 'Saltar al contenido',
   },
   common: {
@@ -233,9 +234,10 @@ type Content = typeof es;
 
 const en: Content = {
   meta: {
-    tagline: 'Play chess. Conquer the world.',
+    tagline: 'Online chess where you win Seeds',
     description:
-      'An online chess platform where every game is played for Seeds, the in-game currency. Create your board, choose your rules and compete against the world.',
+      'Play online chess against opponents from around the world and win Seeds in every game. Create your board, set your rules and get the free app on Google Play.',
+    ogAlt: 'Chess Fortune: Play chess and conquer the world!',
     skip: 'Skip to content',
   },
   common: {

@@ -149,7 +149,7 @@ const nav = c.nav.items.map((i) => ({ ...i, url: localize(i.href, lang) }));
     // El header persiste entre páginas: actualizar el selector de idioma a la página actual
     const p = location.pathname.replace(/^\/en(?=\/|$)/, '').replace(/\/+$/, '') || '/';
     document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) => {
-      a.href = a.dataset.langLink === 'en' ? (p === '/' ? '/en/' : `/en${p}`) : p;
+      a.href = a.dataset.langLink === 'en' ? (p === '/' ? '/en/' : `/en${p}/`) : (p === '/' ? '/' : `${p}/`);
     });
 
     if (w.__cfMenuBound) return;

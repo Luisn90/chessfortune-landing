@@ -14,6 +14,35 @@ const c = content[lang];
 const { title, description = c.meta.description } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${c.meta.tagline}`;
 const siteUrl = Astro.site ?? 'https://chessfortune.com';
+const pageUrl = new URL(localize(Astro.url.pathname, lang), siteUrl).href;
+const ogImage = new URL(lang === 'en' ? '/og-en.jpg' : '/og.jpg', siteUrl).href;
+const isHome = localize(Astro.url.pathname, 'es') === '/';
+// Datos estructurados: organización + web en todas las páginas; la app en la home
+const ld: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Chess Fortune',
+    url: siteUrl.toString(),
+    logo: new URL('/brand/logo.svg', siteUrl).href,
+    sameAs: [site.instagram, site.youtube, site.facebook, site.discord],
+  },
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Chess Fortune', url: siteUrl.toString(), inLanguage: lang },
+];
+if (isHome) ld.push({
+  '@context': 'https://schema.org',
+  '@type': 'MobileApplication',
+  name: 'Chess Fortune',
+  operatingSystem: 'ANDROID',
+  applicationCategory: 'GameApplication',
+  description: c.meta.description,
+  contentRating: 'Mature 17+',
+  installUrl: site.playStore,
+  url: site.playStore,
+  image: ogImage,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  publisher: { '@type': 'Organization', name: 'Chess Fortune' },
+});
 ---
 
 <!doctype html>
@@ -27,16 +56,26 @@ const siteUrl = Astro.site ?? 'https://chessfortune.com';
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, siteUrl)} />
+    <link rel="canonical" href={pageUrl} />
     {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(localize(Astro.url.pathname, l), siteUrl)} />)}
     <link rel="alternate" hreflang="x-default" href={new URL(localize(Astro.url.pathname, 'es'), siteUrl)} />
     <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'es_ES'} />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Chess Fortune" />
+    <meta property="og:url" content={pageUrl} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/og.jpg" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={c.meta.ogAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />
 
     <ClientRouter />
   </head>

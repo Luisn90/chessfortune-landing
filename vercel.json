@@ -1,0 +1,45 @@
+{
+  "redirects": [
+    {
+      "source": "/gamefeatures",
+      "destination": "/juego/",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/contacto/",
+      "permanent": true
+    },
+    {
+      "source": "/terms&cond",
+      "destination": "/terminos/",
+      "permanent": true
+    },
+    {
+      "source": "/terms%26cond",
+      "destination": "/terminos/",
+      "permanent": true
+    },
+    {
+      "source": "/gamefeatures/",
+      "destination": "/juego/",
+      "permanent": true
+    },
+    {
+      "source": "/contact/",
+      "destination": "/contacto/",
+      "permanent": true
+    },
+    {
+      "source": "/terms&cond/",
+      "destination": "/terminos/",
+      "permanent": true
+    },
+    {
+      "source": "/terms%26cond/",
+      "destination": "/terminos/",
+      "permanent": true
+    }
+  ],
+  "trailingSlash": true
+}

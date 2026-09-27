@@ -12,11 +12,11 @@ export const stripLang = (pathname: string): string => {
   return p || '/';
 };
 
-/** Ruta en el idioma indicado: ('/seeds', 'en') → '/en/seeds'. */
+/** Ruta en el idioma indicado, siempre con barra final: ('/seeds', 'en') → '/en/seeds/'. */
 export const localize = (path: string, lang: Lang): string => {
   const clean = stripLang(path);
-  if (lang === defaultLang) return clean;
-  return clean === '/' ? '/en/' : `/en${clean}`;
+  const prefix = lang === defaultLang ? '' : '/en';
+  return clean === '/' ? `${prefix}/` : `${prefix}${clean}/`;
 };
 
 /** Convierte 'línea uno|línea *acento*.' en HTML con <br /> y texto dorado. */
