@@ -1,12 +1,12 @@
 ---
-import { nav, site } from '../data/site';
+import { site } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, localize, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
 const year = new Date().getFullYear();
-
-const legal = [
-  { label: 'Términos y condiciones', href: '/terminos' },
-  { label: 'Política de privacidad', href: '/terminos' },
-  { label: 'Juego responsable', href: '/terminos' },
-];
+const nav = c.nav.items.map((i) => ({ ...i, href: localize(i.href, lang) }));
+const legal = c.footer.legal.map((i) => ({ ...i, href: localize(i.href, lang) }));
 const socials = [
   { label: 'Instagram', href: site.instagram },
   { label: 'YouTube', href: site.youtube },
@@ -20,16 +20,14 @@ const socials = [
     <div class="relative overflow-hidden rounded-panel border border-line/60 bg-surface/40 px-8 pb-12 pt-16 lg:px-14">
       <div class="relative grid gap-14 lg:grid-cols-12">
         <div class="lg:col-span-5">
-          <a href="/" aria-label="Chess Fortune, inicio">
+          <a href={localize('/', lang)} aria-label={c.common.homeAria}>
             <img src="/brand/logo.svg" alt="Chess Fortune" class="h-9 w-auto" width="887" height="265" loading="lazy" />
           </a>
-          <p class="mt-7 max-w-sm leading-relaxed text-mist">
-            Ajedrez en línea con Seeds reales. Crea tu tablero, elige tus reglas y compite contra el mundo entero.
-          </p>
+          <p class="mt-7 max-w-sm leading-relaxed text-mist">{c.footer.blurb}</p>
         </div>
 
-        <nav class="lg:col-span-3" aria-label="Navegación del pie">
-          <h2 class="eyebrow mb-6 text-[0.58rem]">Navegación</h2>
+        <nav class="lg:col-span-3" aria-label={c.footer.navAria}>
+          <h2 class="eyebrow mb-6 text-[0.58rem]">{c.footer.navTitle}</h2>
           <ul class="space-y-3">
             {nav.map((item) => (
               <li><a href={item.href} class="link-underline text-sm text-mist transition-colors duration-400 hover:text-white">{item.label}</a></li>
@@ -38,7 +36,7 @@ const socials = [
         </nav>
 
         <div class="lg:col-span-2">
-          <h2 class="eyebrow mb-6 text-[0.58rem]">Legal</h2>
+          <h2 class="eyebrow mb-6 text-[0.58rem]">{c.footer.legalTitle}</h2>
           <ul class="space-y-3">
             {legal.map((item) => (
               <li><a href={item.href} class="link-underline text-sm text-mist transition-colors duration-400 hover:text-white">{item.label}</a></li>
@@ -47,7 +45,7 @@ const socials = [
         </div>
 
         <div class="lg:col-span-2">
-          <h2 class="eyebrow mb-6 text-[0.58rem]">Comunidad</h2>
+          <h2 class="eyebrow mb-6 text-[0.58rem]">{c.footer.communityTitle}</h2>
           <ul class="space-y-3">
             {socials.map((item) => (
               <li><a href={item.href} rel="noopener" class="link-underline text-sm text-mist transition-colors duration-400 hover:text-white">{item.label}</a></li>
@@ -58,10 +56,10 @@ const socials = [
 
       <hr class="rule relative mt-16" />
       <div class="relative mt-8 flex flex-col gap-4 text-[0.7rem] uppercase tracking-[0.16em] text-mist/60 sm:flex-row sm:items-center sm:justify-between">
-        <p>© {year} Chess Fortune. Todos los derechos reservados.</p>
+        <p>© {year} Chess Fortune. {c.footer.rights}</p>
         <p class="flex items-center gap-3">
           <span class="grid size-7 place-items-center rounded-full border border-gold/40 text-gold">18</span>
-          Juega con responsabilidad
+          {c.footer.responsible}
         </p>
       </div>
     </div>

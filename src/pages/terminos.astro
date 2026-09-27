@@ -1,24 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
+import { content } from '../i18n/content';
+import { getLang } from '../i18n';
+const lang = getLang(Astro.currentLocale);
 
-const sections = [
-  { h: '1. Objeto', p: 'Estas condiciones regulan el acceso y uso de la plataforma Chess Fortune, incluidos el juego de ajedrez en línea, el sistema de Seeds y los servicios asociados.' },
-  { h: '2. Requisitos de acceso', p: 'El uso de tableros con Seeds está reservado a personas mayores de 18 años con capacidad legal para contratar. Las salas de práctica gratuitas admiten usuarios desde los 16 años con consentimiento de su tutor legal.' },
-  { h: '3. Naturaleza de las Seeds', p: 'Las Seeds son una moneda de uso interno de la plataforma. No constituyen dinero electrónico, valor negociable ni criptoactivo, y su canje está sujeto a verificación de identidad y a la normativa aplicable en el país de residencia del usuario.' },
-  { h: '4. Juego limpio', p: 'Queda prohibido el uso de motores de análisis, asistencia externa, cuentas múltiples o cualquier práctica dirigida a alterar el resultado de una partida. El incumplimiento conlleva la pérdida del bote en disputa y la suspensión de la cuenta.' },
-  { h: '5. Retiros', p: 'Las solicitudes de retiro se procesan en un plazo de 24 a 72 horas hábiles tras la verificación de identidad. Chess Fortune podrá retener temporalmente un retiro si existen indicios razonables de fraude.' },
-  { h: '6. Responsabilidad', p: 'Chess Fortune no responde de interrupciones derivadas de la conexión del usuario. El reloj de partida se gestiona en servidor precisamente para minimizar el impacto de estas incidencias.' },
-];
+const t = content[lang].pages.terminos;
+const sections = t.sections;
 ---
 
-<Layout title="Términos y condiciones" description="Condiciones de uso de la plataforma Chess Fortune.">
-  <PageHeader
-    eyebrow="Legal"
-    title="Términos y"
-    accent="condiciones."
-    lead="Última actualización: julio de 2026. Este texto es una plantilla de referencia y debe ser revisado por asesoría legal antes de publicarse."
-  />
+<Layout title={t.title} description={t.description}>
+  <PageHeader eyebrow={t.eyebrow} title={t.heading} accent={t.accent} lead={t.lead} />
 
   <section class="py-20 lg:py-28">
     <div class="mx-auto max-w-3xl space-y-4 px-6 lg:px-10">

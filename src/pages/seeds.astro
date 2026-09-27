@@ -3,31 +3,26 @@ import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Seeds from '../components/Seeds.astro';
 import Faq from '../components/Faq.astro';
+import { site } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
 
-const tiers = [
-  { name: 'Semilla', seeds: '500', price: '4,99 €', note: 'Para probar las mesas bajas.' },
-  { name: 'Brote', seeds: '2.750', price: '19,99 €', note: '+10 % de bonificación.', featured: true },
-  { name: 'Cosecha', seeds: '8.000', price: '49,99 €', note: '+20 % y acceso a torneos.' },
-];
+const t = content[lang].pages.seeds;
+const c = content[lang];
+const tiers = t.tiers as { name: string; seeds: string; price: string; note: string; featured?: boolean }[];
 ---
 
-<Layout title="Seeds" description="Qué son las Seeds, cómo se ganan, cómo se guardan y cómo se retiran a tu billetera digital.">
-  <PageHeader
-    eyebrow="e5 · La moneda"
-    title="Seeds: la moneda que convierte una partida en"
-    accent="una apuesta."
-    lead="Ganas Seeds jugando, las arriesgas en el tablero y las retiras cuando quieras. Un ciclo cerrado, sin letra pequeña."
-  />
+<Layout title={t.title} description={t.description}>
+  <PageHeader eyebrow={t.eyebrow} title={t.heading} accent={t.accent} lead={t.lead} />
 
   <Seeds />
 
   <section class="py-24 lg:py-36">
     <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
       <hr class="rule rule-fade mb-24 lg:mb-32" />
-      <p data-reveal="wipe" class="eyebrow mb-5">Paquetes</p>
-      <h2 data-reveal="mask" style="--reveal-delay:90ms" class="max-w-2xl text-[length:var(--text-display)]">
-        Si quieres subir de mesa,<br /> sube de <span class="text-gilded">bolsa</span>.
-      </h2>
+      <p data-reveal="wipe" class="eyebrow mb-5">{t.packsEyebrow}</p>
+      <h2 data-reveal="mask" style="--reveal-delay:90ms" class="max-w-2xl text-[length:var(--text-display)]" set:html={rich(t.packsTitle)} />
 
       <div class="mt-16 grid gap-4 lg:grid-cols-3">
         {tiers.map((t, i) => (
@@ -40,29 +35,29 @@ const tiers = [
             ]}
           >
             {t.featured && (
-              <span class="absolute right-5 top-5 rounded-chip bg-gold px-4 py-1.5 font-sans text-[0.6rem] uppercase tracking-[0.2em] text-navy">Más elegido</span>
+              <span class="absolute right-5 top-5 rounded-chip bg-gold px-4 py-1.5 font-sans text-[0.6rem] uppercase tracking-[0.2em] text-navy">{t.popular}</span>
             )}
             <h3 class="font-display text-3xl text-white">{t.name}</h3>
             <p class="mt-6 font-display text-5xl text-gilded">{t.seeds}</p>
-            <p class="mt-1 font-sans text-[0.68rem] uppercase tracking-[0.22em] text-mist/70">Seeds</p>
+            <p class="mt-1 font-sans text-[0.68rem] uppercase tracking-[0.22em] text-mist/70">{t.unit}</p>
             <p class="mt-8 text-sm text-mist">{t.note}</p>
             <p class="mt-8 font-display text-2xl text-white">{t.price}</p>
             <a
-              href="https://discord.com/invite/fJd4RSMnTy"
+              href={site.discord}
               rel="noopener"
               class:list={[
                 'mt-8 block w-full py-4 text-center font-sans text-[0.72rem] uppercase tracking-[0.2em] transition-all duration-500',
                 t.featured ? 'btn-gold text-navy' : 'btn-ghost border border-line text-ivory',
               ]}
             >
-              Únete al Discord
+              {c.common.discord}
             </a>
           </article>
         ))}
       </div>
 
       <p class="mt-10 max-w-2xl text-xs leading-relaxed text-mist/60">
-        Precios orientativos previos al lanzamiento. Las Seeds no son una criptomoneda ni un instrumento financiero: son moneda de uso interno de la plataforma. Retirada sujeta a verificación de identidad y a la normativa vigente de tu país de residencia.
+        {t.disclaimer}
       </p>
     </div>
   </section>

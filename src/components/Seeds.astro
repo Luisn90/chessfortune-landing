@@ -1,5 +1,9 @@
 ---
-import { seedsFlow } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, localize, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const seedsFlow = c.seeds.flow;
 ---
 
 <section id="seeds" class="relative overflow-hidden py-24 lg:py-40">
@@ -27,13 +31,9 @@ import { seedsFlow } from '../data/site';
       </div>
 
       <div class="order-1 lg:order-2 lg:col-span-7">
-        <p data-reveal="wipe" class="eyebrow mb-5">La moneda · Seeds</p>
-        <h2 data-reveal="mask" style="--reveal-delay:90ms" class="text-[length:var(--text-display)]">
-          Tu poder<br /> en el <span class="text-gilded">juego</span>.
-        </h2>
-        <p data-reveal="up" style="--reveal-delay:200ms" class="mt-8 max-w-xl text-lg leading-relaxed text-mist">
-          Las Seeds son la moneda de Chess Fortune. No son un adorno: son la apuesta, el premio y la llave de acceso a las mesas altas. Un ciclo cerrado y transparente.
-        </p>
+        <p data-reveal="wipe" class="eyebrow mb-5">{c.seeds.eyebrow}</p>
+        <h2 data-reveal="mask" style="--reveal-delay:90ms" class="text-[length:var(--text-display)]" set:html={rich(c.seeds.title)} />
+        <p data-reveal="up" style="--reveal-delay:200ms" class="mt-8 max-w-xl text-lg leading-relaxed text-mist">{c.seeds.lead}</p>
 
         <ol class="mt-14 space-y-3">
           {seedsFlow.map((f, i) => (

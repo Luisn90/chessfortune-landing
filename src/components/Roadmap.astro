@@ -1,5 +1,9 @@
 ---
-import { roadmap } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, localize, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const roadmap = c.roadmap.items;
 import PlayStoreButton from './PlayStoreButton.astro';
 ---
 
@@ -9,12 +13,10 @@ import PlayStoreButton from './PlayStoreButton.astro';
 
     <div class="mb-16 flex flex-wrap items-end justify-between gap-8 lg:mb-20">
       <div>
-        <p data-reveal="wipe" class="eyebrow mb-5">Roadmap</p>
-        <h2 id="roadmap-title" data-reveal="mask" style="--reveal-delay:90ms" class="max-w-4xl text-[length:var(--text-display)]">
-          Primer movimiento hecho.<br /> Vamos a por el <span class="text-gilded">siguiente</span>.
-        </h2>
+        <p data-reveal="wipe" class="eyebrow mb-5">{c.roadmap.eyebrow}</p>
+        <h2 id="roadmap-title" data-reveal="mask" style="--reveal-delay:90ms" class="max-w-4xl text-[length:var(--text-display)]" set:html={rich(c.roadmap.title)} />
       </div>
-      <p data-reveal="up" style="--reveal-delay:200ms" class="max-w-xs text-sm text-mist">Así avanza Chess Fortune. Te contamos cada paso antes de darlo.</p>
+      <p data-reveal="up" style="--reveal-delay:200ms" class="max-w-xs text-sm text-mist">{c.roadmap.lead}</p>
     </div>
 
     <ol class="relative grid gap-5 lg:grid-cols-3 lg:gap-6">
@@ -56,8 +58,8 @@ import PlayStoreButton from './PlayStoreButton.astro';
           >
             <div class="flex flex-wrap items-center gap-3">
               <span class:list={['eyebrow text-[0.6rem]', m.status !== 'done' && 'text-mist']}>{m.date}</span>
-              {m.status === 'done' && <span class="rounded-chip border border-gold/30 bg-gold/10 px-2.5 py-1 font-sans text-[0.58rem] uppercase tracking-[0.2em] text-gold">Completado</span>}
-              {m.status === 'next' && <span class="rounded-chip border border-line px-2.5 py-1 font-sans text-[0.58rem] uppercase tracking-[0.2em] text-ivory">Fecha por anunciar</span>}
+              {m.status === 'done' && <span class="rounded-chip border border-gold/30 bg-gold/10 px-2.5 py-1 font-sans text-[0.58rem] uppercase tracking-[0.2em] text-gold">{c.roadmap.done}</span>}
+              {m.status === 'next' && <span class="rounded-chip border border-line px-2.5 py-1 font-sans text-[0.58rem] uppercase tracking-[0.2em] text-ivory">{c.roadmap.tba}</span>}
             </div>
             <h3 class="mt-5 font-display text-3xl text-white lg:text-[2.1rem]">{m.title}</h3>
             <p class="mt-4 text-sm leading-relaxed text-mist">{m.body}</p>

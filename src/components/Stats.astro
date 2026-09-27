@@ -1,5 +1,9 @@
 ---
-import { stats } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const stats = c.stats;
 ---
 
 <section class="mx-auto max-w-[1400px] px-6 pb-24 lg:px-10 lg:pb-32">

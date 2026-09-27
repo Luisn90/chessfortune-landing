@@ -4,14 +4,19 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 import { site } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, localize, locales } from '../i18n';
 
 interface Props { title?: string; description?: string }
-const { title, description = site.description } = Astro.props;
-const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.tagline}`;
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const { title, description = c.meta.description } = Astro.props;
+const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${c.meta.tagline}`;
+const siteUrl = Astro.site ?? 'https://chessfortune.com';
 ---
 
 <!doctype html>
-<html lang="es" class="scroll-pt-24">
+<html lang={lang} class="scroll-pt-24">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,7 +26,10 @@ const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? 'https://chessfortune.com')} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, siteUrl)} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(localize(Astro.url.pathname, l), siteUrl)} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(localize(Astro.url.pathname, 'es'), siteUrl)} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'es_ES'} />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
@@ -36,7 +44,7 @@ const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site
     <div id="cursor" aria-hidden="true"></div>
 
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-btn focus:bg-gold focus:px-4 focus:py-2 focus:text-navy">
-      Saltar al contenido
+      {c.meta.skip}
     </a>
 
     <Nav />

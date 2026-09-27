@@ -2,23 +2,17 @@
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { site } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang } from '../i18n';
+const lang = getLang(Astro.currentLocale);
 
-const channels = [
-  { label: 'Soporte de jugador', value: 'soporte@chessfortune.com', href: 'mailto:soporte@chessfortune.com' },
-  { label: 'Prensa y marca', value: 'prensa@chessfortune.com', href: 'mailto:prensa@chessfortune.com' },
-  { label: 'Alianzas y creadores', value: 'partners@chessfortune.com', href: 'mailto:partners@chessfortune.com' },
-  { label: 'Comunidad en directo', value: 'Discord de Chess Fortune', href: site.discord },
-];
+const t = content[lang].pages.contacto;
+const channels = t.channels.map((ch) => ({ ...ch, href: ch.href === 'discord' ? site.discord : ch.href }));
 const input = 'w-full rounded-btn border border-line bg-surface/50 px-5 py-4 text-sm text-ivory transition-colors duration-400 focus:border-gold focus:outline-none';
 ---
 
-<Layout title="Contacto" description="Habla con el equipo de Chess Fortune: soporte, prensa, alianzas y comunidad.">
-  <PageHeader
-    eyebrow="g7 · Contacto"
-    title="Cuéntanos qué"
-    accent="necesitas."
-    lead="Respondemos en menos de 24 horas hábiles. Si es una incidencia con una partida en curso, el canal más rápido es el Discord."
-  />
+<Layout title={t.title} description={t.description}>
+  <PageHeader eyebrow={t.eyebrow} title={t.heading} accent={t.accent} lead={t.lead} />
 
   <section class="py-20 lg:py-28">
     <div class="mx-auto grid max-w-[1400px] gap-16 px-6 lg:grid-cols-12 lg:gap-20 lg:px-10">
@@ -38,31 +32,27 @@ const input = 'w-full rounded-btn border border-line bg-surface/50 px-5 py-4 tex
       </div>
 
       <div class="lg:col-span-7">
-        <form id="contact-form" class="grid gap-5 sm:grid-cols-2" novalidate>
+        <form id="contact-form" class="grid gap-5 sm:grid-cols-2" novalidate data-msg-invalid={t.form.invalid} data-msg-sent={t.form.sent}>
           <div data-reveal="up" class="sm:col-span-1">
-            <label for="name" class="eyebrow mb-3 block text-[0.56rem]">Nombre</label>
+            <label for="name" class="eyebrow mb-3 block text-[0.56rem]">{t.form.name}</label>
             <input id="name" name="name" required class={input} />
           </div>
           <div data-reveal="up" style="--reveal-delay:80ms" class="sm:col-span-1">
-            <label for="cemail" class="eyebrow mb-3 block text-[0.56rem]">Correo</label>
+            <label for="cemail" class="eyebrow mb-3 block text-[0.56rem]">{t.form.email}</label>
             <input id="cemail" name="email" type="email" required class={input} />
           </div>
           <div data-reveal="up" style="--reveal-delay:160ms" class="sm:col-span-2">
-            <label for="subject" class="eyebrow mb-3 block text-[0.56rem]">Motivo</label>
+            <label for="subject" class="eyebrow mb-3 block text-[0.56rem]">{t.form.subject}</label>
             <select id="subject" name="subject" class:list={[input, 'appearance-none']}>
-              <option>Incidencia con una partida</option>
-              <option>Problema con Seeds o retiros</option>
-              <option>Prensa</option>
-              <option>Alianzas y creadores</option>
-              <option>Otro</option>
+              {t.form.options.map((o) => <option>{o}</option>)}
             </select>
           </div>
           <div data-reveal="up" style="--reveal-delay:240ms" class="sm:col-span-2">
-            <label for="message" class="eyebrow mb-3 block text-[0.56rem]">Mensaje</label>
+            <label for="message" class="eyebrow mb-3 block text-[0.56rem]">{t.form.message}</label>
             <textarea id="message" name="message" rows="6" required class:list={[input, 'resize-none']}></textarea>
           </div>
           <div data-reveal="up" style="--reveal-delay:320ms" class="sm:col-span-2">
-            <button type="submit" class="btn-gold px-10 py-4 font-sans text-[0.72rem] font-medium uppercase tracking-[0.2em] text-navy">Enviar mensaje</button>
+            <button type="submit" class="btn-gold px-10 py-4 font-sans text-[0.72rem] font-medium uppercase tracking-[0.2em] text-navy">{t.form.submit}</button>
             <p id="contact-msg" role="status" class="mt-4 h-5 font-sans text-xs text-gold"></p>
           </div>
         </form>
@@ -79,11 +69,11 @@ const input = 'w-full rounded-btn border border-line bg-surface/50 px-5 py-4 tex
         if (!msg) return;
         if (!form.checkValidity()) {
           msg.style.color = '#e07a5f';
-          msg.textContent = 'Revisa los campos obligatorios.';
+          msg.textContent = form.dataset.msgInvalid || '';
           return;
         }
         msg.style.color = '';
-        msg.textContent = 'Mensaje enviado. Te respondemos en menos de 24 h.';
+        msg.textContent = form.dataset.msgSent || '';
         form.reset();
       });
     }

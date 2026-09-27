@@ -5,17 +5,24 @@
  */
 import { siGoogleplay } from 'simple-icons';
 import { site } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+
 
 interface Props { label?: string; class?: string }
-const { label = 'Descarga la app', class: cls = '' } = Astro.props;
+const { label = c.common.download, class: cls = '' } = Astro.props;
+// Si quien lo usa lo oculta en algún tamaño (hidden sm:inline-flex), no forzar display aquí
+const display = /(^|\s)hidden(\s|$)/.test(cls) ? '' : 'inline-flex';
 ---
 
 <a
   href={site.playStore}
   target="_blank"
   rel="noopener"
-  class:list={['btn-gold inline-flex items-center gap-3 font-sans font-medium uppercase text-navy', cls]}
-  aria-label={`${label} en Google Play`}
+  class:list={['btn-gold items-center gap-3 font-sans font-medium uppercase text-navy', display, cls]}
+  aria-label={`${label} ${c.common.onGooglePlay}`}
 >
   <svg class="size-[1.15em] shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={siGoogleplay.path} /></svg>
   <span>{label}</span>

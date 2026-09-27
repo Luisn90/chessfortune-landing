@@ -1,6 +1,10 @@
 ---
 import SeedMark from './SeedMark.astro';
-const items = ['Sala global 24/7','Bullet · Blitz · Rápidas','Apuesta en Seeds','Antitrampas en tiempo real','Retiros verificados','68 países','Tú pones las reglas'];
+import { content } from '../i18n/content';
+import { getLang } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const items = c.ticker;
 ---
 
 <div class="mx-auto max-w-[1400px] px-6 lg:px-10">

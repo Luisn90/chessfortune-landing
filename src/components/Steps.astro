@@ -1,14 +1,16 @@
 ---
-import { steps } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, localize, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const steps = c.steps.items;
 ---
 
 <section id="como-funciona" class="relative mx-auto max-w-[1400px] px-6 py-24 lg:px-10 lg:py-40">
   <hr class="rule rule-fade mb-24 lg:mb-32" />
   <header class="mb-20 max-w-2xl lg:mb-28">
-    <p data-reveal="wipe" class="eyebrow mb-5">La apertura · Cómo funciona</p>
-    <h2 data-reveal="mask" style="--reveal-delay:100ms" class="text-[length:var(--text-display)]">
-      Cuatro jugadas entre<br /> tú y el <span class="text-gilded">primer bote</span>.
-    </h2>
+    <p data-reveal="wipe" class="eyebrow mb-5">{c.steps.eyebrow}</p>
+    <h2 data-reveal="mask" style="--reveal-delay:100ms" class="text-[length:var(--text-display)]" set:html={rich(c.steps.title)} />
   </header>
 
   <div class="relative">

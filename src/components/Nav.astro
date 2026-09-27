@@ -1,8 +1,12 @@
 ---
-import { nav, site } from '../data/site';
-const path = Astro.url.pathname;
-const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
 import PlayStoreButton from './PlayStoreButton.astro';
+import { content } from '../i18n/content';
+import { getLang, localize, stripLang, locales, langNames } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const path = stripLang(Astro.url.pathname);
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+const nav = c.nav.items.map((i) => ({ ...i, url: localize(i.href, lang) }));
 ---
 
 <header id="site-nav" transition:persist class="fixed inset-x-0 top-0 z-70 py-4">
@@ -11,15 +15,15 @@ import PlayStoreButton from './PlayStoreButton.astro';
       id="nav-shell"
       class="flex items-center justify-between rounded-panel border border-transparent px-4 py-2.5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] data-[stuck=true]:border-line/70 data-[stuck=true]:bg-navy/80 data-[stuck=true]:backdrop-blur-xl lg:px-6"
     >
-      <a href="/" class="flex items-center transition-opacity duration-400 hover:opacity-80" aria-label="Chess Fortune, inicio">
+      <a href={localize('/', lang)} class="flex items-center transition-opacity duration-400 hover:opacity-80" aria-label={c.common.homeAria}>
         <img src="/brand/logo.svg" alt="Chess Fortune" class="h-7 w-auto sm:h-8" width="887" height="265" />
       </a>
 
-      <nav class="hidden items-center gap-8 md:flex" aria-label="Principal">
+      <nav class="hidden items-center gap-8 md:flex" aria-label={c.nav.mainAria}>
         {
           nav.map((item) => (
             <a
-              href={item.href}
+              href={item.url}
               aria-current={isActive(item.href) ? 'page' : undefined}
               class:list={[
                 'link-underline group relative font-sans text-[0.82rem] uppercase tracking-[0.18em] transition-colors duration-400',
@@ -35,12 +39,28 @@ import PlayStoreButton from './PlayStoreButton.astro';
         }
       </nav>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center rounded-chip border border-line bg-surface/60 p-0.5 font-sans text-[0.62rem] font-medium tracking-[0.16em]" role="group" aria-label={c.common.language}>
+          {locales.map((l) => (
+            <a
+              href={localize(Astro.url.pathname, l)}
+              hreflang={l}
+              lang={l}
+              title={langNames[l]}
+              data-astro-reload
+              data-lang-link={l}
+              aria-current={l === lang ? 'true' : undefined}
+              class:list={['rounded-chip px-2.5 py-1.5 uppercase transition-colors duration-300', l === lang ? 'bg-gold/15 text-gold' : 'text-mist hover:text-white']}
+            >{l}</a>
+          ))}
+        </div>
         <PlayStoreButton class="hidden whitespace-nowrap px-5 py-3 text-[0.7rem] tracking-[0.2em] sm:inline-flex" />
         <button
           id="menu-btn"
           type="button"
-          aria-label="Abrir menú"
+          aria-label={c.nav.open}
+          data-label-open={c.nav.open}
+          data-label-close={c.nav.close}
           aria-expanded="false"
           aria-controls="menu-panel"
           class="group grid size-10 place-items-center rounded-btn border border-line bg-surface/60 md:hidden"
@@ -69,11 +89,11 @@ import PlayStoreButton from './PlayStoreButton.astro';
       }
     </div>
 
-    <nav class="relative flex h-full flex-col justify-center gap-2 px-8" aria-label="Menú móvil">
+    <nav class="relative flex h-full flex-col justify-center gap-2 px-8" aria-label={c.nav.mobileAria}>
       {
         nav.map((item, i) => (
           <a
-            href={item.href}
+            href={item.url}
             class="menu-link flex translate-y-6 items-baseline gap-4 rounded-card px-4 py-4 font-display text-4xl text-white opacity-0 transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)]"
             style={`transition-delay:${320 + i * 70}ms`}
           >
@@ -104,7 +124,7 @@ import PlayStoreButton from './PlayStoreButton.astro';
     const panel = document.getElementById('menu-panel');
     if (!btn || !panel) return;
     btn.setAttribute('aria-expanded', String(open));
-    btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    btn.setAttribute('aria-label', (open ? btn.dataset.labelClose : btn.dataset.labelOpen) || '');
     panel.classList.toggle('pointer-events-none', !open);
     panel.classList.toggle('opacity-0', !open);
     if (open) panel.removeAttribute('inert');
@@ -125,6 +145,12 @@ import PlayStoreButton from './PlayStoreButton.astro';
       window.addEventListener('scroll', w.__cfNavScroll, { passive: true });
     }
     w.__cfNavScroll();
+
+    // El header persiste entre páginas: actualizar el selector de idioma a la página actual
+    const p = location.pathname.replace(/^\/en(?=\/|$)/, '').replace(/\/+$/, '') || '/';
+    document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) => {
+      a.href = a.dataset.langLink === 'en' ? (p === '/' ? '/en/' : `/en${p}`) : p;
+    });
 
     if (w.__cfMenuBound) return;
     w.__cfMenuBound = true;

@@ -1,16 +1,18 @@
 ---
 import Piece from './Piece.astro';
-import { features } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, localize, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const features = c.features.items as unknown as { code: string; piece: 'rook' | 'knight' | 'bishop' | 'queen'; title: string; body: string; bullets: string[] }[];
 ---
 
 <section id="el-juego" class="relative">
   <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
     <hr class="rule rule-fade" />
     <header class="py-24 lg:py-32">
-      <p data-reveal="wipe" class="eyebrow mb-5">El medio juego · La plataforma</p>
-      <h2 data-reveal="mask" style="--reveal-delay:100ms" class="max-w-4xl text-[length:var(--text-display)]">
-        Todo lo que un tablero<br /> debería haber sido <span class="text-gilded">siempre</span>.
-      </h2>
+      <p data-reveal="wipe" class="eyebrow mb-5">{c.features.eyebrow}</p>
+      <h2 data-reveal="mask" style="--reveal-delay:100ms" class="max-w-4xl text-[length:var(--text-display)]" set:html={rich(c.features.title)} />
     </header>
 
     <div id="features" class="grid gap-16 lg:grid-cols-12 lg:gap-16">
@@ -39,7 +41,7 @@ import { features } from '../data/site';
         {features.map((f, i) => (
           <article class="feat-item transition-opacity duration-700 lg:min-h-[75vh]" data-item={i} data-code={f.code}>
             <div class="rounded-card border border-line/50 bg-surface/25 p-8 lg:p-10">
-              <p data-reveal="up" class="eyebrow mb-6 text-[0.6rem]">{f.code} · Característica 0{i + 1}</p>
+              <p data-reveal="up" class="eyebrow mb-6 text-[0.6rem]">{f.code} · {c.features.label} 0{i + 1}</p>
               <h3 data-reveal="mask" style="--reveal-delay:80ms" class="max-w-lg text-[length:var(--text-title)]">{f.title}</h3>
               <p data-reveal="up" style="--reveal-delay:180ms" class="mt-7 max-w-xl text-lg leading-relaxed text-mist">{f.body}</p>
               <ul data-reveal="up" style="--reveal-delay:260ms" class="mt-9 flex flex-wrap gap-3">

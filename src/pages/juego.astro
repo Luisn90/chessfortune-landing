@@ -4,15 +4,14 @@ import PageHeader from '../components/PageHeader.astro';
 import Steps from '../components/Steps.astro';
 import Features from '../components/Features.astro';
 import Security from '../components/Security.astro';
+import { content } from '../i18n/content';
+import { getLang, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const t = content[lang].pages.juego;
 ---
 
-<Layout title="El juego" description="Cómo se juega en Chess Fortune: salas abiertas, tableros a medida, ritmos oficiales y un entorno auditado.">
-  <PageHeader
-    eyebrow="c3 · El juego"
-    title="Entra, elige tablero y"
-    accent="juega."
-    lead="Chess Fortune no reinventa el ajedrez: reinventa lo que hay alrededor. Sala global abierta, tableros configurables al detalle y un bote real esperando en cada partida."
-  />
+<Layout title={t.title} description={t.description}>
+  <PageHeader eyebrow={t.eyebrow} title={t.heading} accent={t.accent} lead={t.lead} />
   <Steps />
   <Features />
   <Security />

@@ -1,5 +1,9 @@
 ---
-import { faqs } from '../data/site';
+import { content } from '../i18n/content';
+import { getLang, localize, rich } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const faqs = c.faq.items;
 ---
 
 <section id="faq" class="py-24 lg:py-36">
@@ -7,10 +11,10 @@ import { faqs } from '../data/site';
     <hr class="rule rule-fade mb-24 lg:mb-32" />
     <div class="grid gap-16 lg:grid-cols-12 lg:gap-20">
       <div class="lg:col-span-4">
-        <p data-reveal="wipe" class="eyebrow mb-5">Dudas razonables</p>
-        <h2 data-reveal="mask" style="--reveal-delay:90ms" class="text-[length:var(--text-display)]">Antes de<br /> mover <span class="text-gilded">pieza</span>.</h2>
-        <p data-reveal="up" style="--reveal-delay:200ms" class="mt-8 text-sm leading-relaxed text-mist">¿Falta algo? Escríbenos y lo resolvemos en menos de 24 horas.</p>
-        <a href="/contacto" data-reveal="up" style="--reveal-delay:280ms" class="link-underline mt-6 inline-block font-sans text-[0.72rem] uppercase tracking-[0.2em] text-gold">Contactar al equipo</a>
+        <p data-reveal="wipe" class="eyebrow mb-5">{c.faq.eyebrow}</p>
+        <h2 data-reveal="mask" style="--reveal-delay:90ms" class="text-[length:var(--text-display)]" set:html={rich(c.faq.title)} />
+        <p data-reveal="up" style="--reveal-delay:200ms" class="mt-8 text-sm leading-relaxed text-mist">{c.faq.lead}</p>
+        <a href={localize('/contacto', lang)} data-reveal="up" style="--reveal-delay:280ms" class="link-underline mt-6 inline-block font-sans text-[0.72rem] uppercase tracking-[0.2em] text-gold">{c.faq.link}</a>
       </div>
 
       <div class="lg:col-span-8">

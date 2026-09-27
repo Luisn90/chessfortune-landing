@@ -1,13 +1,18 @@
 ---
-const text = 'El ajedrez lleva mil quinientos años esperando algo en juego. Aquí cada movimiento pesa, cada error cuesta y cada victoria se cobra.';
+import { content } from '../i18n/content';
+import { getLang } from '../i18n';
+const lang = getLang(Astro.currentLocale);
+const c = content[lang];
+const text = c.manifesto.text;
+const isAccent = (w: string) => c.manifesto.accent.includes(w.toLowerCase().replace(/[^\p{L}]/gu, ''));
 const words = text.split(' ');
 ---
 
 <section class="mx-auto max-w-5xl px-6 py-28 lg:py-44">
-  <p class="eyebrow mb-10 text-center" data-reveal="wipe">Manifiesto</p>
+  <p class="eyebrow mb-10 text-center" data-reveal="wipe">{c.manifesto.eyebrow}</p>
   <p class="text-center font-display text-[clamp(1.6rem,3.6vw,3.2rem)] leading-[1.22] text-white">
     {words.map((w, i) => (
-      <span data-reveal="up" style={`--reveal-delay:${i * 34}ms`} class:list={['inline-block', /victoria|juego|cobra/.test(w) ? 'text-gilded' : '']}>
+      <span data-reveal="up" style={`--reveal-delay:${i * 34}ms`} class:list={['inline-block', isAccent(w) ? 'text-gilded' : '']}>
         {w}&nbsp;
       </span>
     ))}
