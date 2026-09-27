@@ -35,8 +35,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
       </nav>
 
       <div class="flex items-center gap-3">
-        <a href={site.discord} rel="noopener" class="btn-gold hidden px-6 py-3 font-sans text-[0.7rem] font-medium uppercase tracking-[0.2em] text-navy sm:block">
-          Únete al Discord
+        <a href={site.login} class="btn-ghost hidden whitespace-nowrap border border-line px-5 py-3 font-sans text-[0.7rem] uppercase tracking-[0.2em] text-ivory lg:block">
+          Iniciar sesión
+        </a>
+        <a href={site.register} class="btn-gold hidden whitespace-nowrap px-5 py-3 font-sans text-[0.7rem] font-medium uppercase tracking-[0.2em] text-navy sm:block">
+          Registrarse
         </a>
         <button
           id="menu-btn"
@@ -83,14 +86,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
           </a>
         ))
       }
-      <a
-        href={site.discord}
-        rel="noopener"
-        class="menu-link btn-gold mt-8 translate-y-6 self-start px-7 py-3.5 text-[0.72rem] uppercase tracking-[0.2em] text-navy opacity-0 transition-all duration-600"
-        style="transition-delay:640ms"
-      >
-        Únete al Discord
-      </a>
+      <div class="menu-link mt-8 flex translate-y-6 flex-wrap gap-3 opacity-0 transition-all duration-600" style="transition-delay:640ms">
+        <a href={site.register} class="btn-gold px-7 py-3.5 text-[0.72rem] uppercase tracking-[0.2em] text-navy">Registrarse</a>
+        <a href={site.login} class="btn-ghost border border-line px-7 py-3.5 text-[0.72rem] uppercase tracking-[0.2em] text-ivory">Iniciar sesión</a>
+      </div>
     </nav>
   </div>
 </div>

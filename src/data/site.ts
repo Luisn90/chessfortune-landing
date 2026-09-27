@@ -4,6 +4,9 @@ export const site = {
   description:
     'Plataforma de ajedrez en línea donde cada partida se juega por Seeds, la moneda del juego. Crea tu tablero, elige tus reglas y compite contra el mundo.',
   playStore: 'https://play.google.com/store/search?q=chessfortune&c=apps&utm_source=emea_Med',
+  // TODO dev: rutas reales de autenticación
+  login: '#iniciar-sesion',
+  register: '#registrarse',
   discord: 'https://discord.com/invite/fJd4RSMnTy',
   instagram: 'https://instagram.com/chessfortune',
   youtube: 'https://youtube.com/@chessfortune',
