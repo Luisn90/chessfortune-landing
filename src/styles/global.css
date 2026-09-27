@@ -144,7 +144,10 @@
 [data-reveal='scale'] { transform: scale(0.9); filter: blur(6px); }
 [data-reveal='mask']  { clip-path: inset(0 0 105% 0); transform: translate3d(0, 24px, 0); }
 [data-reveal='wipe']  { clip-path: inset(0 100% 0 0); }
-[data-reveal].is-in   { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0); }
+/* Al terminar, sin recorte: sombras y brillos (hover de botones, tarjetas) pueden desbordar libremente */
+[data-reveal].is-in   { opacity: 1; transform: none; filter: none; clip-path: none; }
+/* Los reveals que animan un recorte necesitan un valor final interpolable: se abre hacia fuera */
+[data-reveal='wipe'].is-in { clip-path: inset(-0.6em -0.6em -0.6em -0.6em); }
 /* Con interlineado 0.94 los descendentes y acentos salen de la caja: el recorte final se abre hacia fuera */
 [data-reveal='mask'].is-in { clip-path: inset(-0.35em -0.25em -0.35em -0.25em); }
 
