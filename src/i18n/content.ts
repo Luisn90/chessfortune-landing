@@ -38,17 +38,17 @@ const es = {
     lead: 'Únete a nuestra vibrante comunidad de jugadores de ajedrez y pon a prueba tus habilidades en partidas emocionantes.',
     scroll: 'Scroll',
   },
-  ticker: ['Sala global 24/7', 'Bullet · Blitz · Rápidas', 'Apuesta en Seeds', 'Antitrampas en tiempo real', 'Retiros verificados', '68 países', 'Tú pones las reglas'],
+  ticker: ['Sala global 24/7', 'Bullet · Blitz · Rápidas', 'Apuesta en Seeds', 'Antitrampas en tiempo real', 'Retiros verificados', 'Retiros en USDT', 'Tú pones las reglas'],
   manifesto: {
     eyebrow: 'Manifiesto',
     text: 'El ajedrez lleva mil quinientos años esperando algo en juego. Aquí cada movimiento pesa, cada error cuesta y cada victoria se cobra.',
     accent: ['juego', 'victoria', 'cobra'],
   },
   stats: [
-    { value: 240, suffix: 'K', label: 'Partidas jugadas en beta' },
-    { value: 68, suffix: '', label: 'Países en la sala global' },
-    { value: 12, suffix: 'M', label: 'Seeds repartidas' },
-    { value: 4.9, suffix: '/5', label: 'Valoración de la beta', decimals: 1 },
+    { value: 1, suffix: ' USD', label: 'Valor fijo de cada Seed' },
+    { value: 36, suffix: 'h', label: 'Máximo para retirar en USDT' },
+    { value: 0, suffix: '%', label: 'Comisión por depositar o retirar' },
+    { value: 17, suffix: '+', label: 'Edad mínima para jugar' },
   ],
   steps: {
     eyebrow: 'La apertura · Cómo funciona',
@@ -65,7 +65,7 @@ const es = {
     title: 'Todo lo que un tablero|debería haber sido *siempre*.',
     label: 'Característica',
     items: [
-      { code: 'b2', piece: 'rook', title: 'Una sala global, siempre abierta', body: 'Rivales de 68 países a cualquier hora. Emparejamiento por Elo real, sin esperas eternas ni salas vacías: siempre hay alguien de tu nivel buscando partida.', bullets: ['Emparejamiento por Elo', 'Latencia < 60 ms', 'Sin salas vacías'] },
+      { code: 'b2', piece: 'rook', title: 'Una sala global, siempre abierta', body: 'Rivales de todo el mundo a cualquier hora. Emparejamiento por Elo real, sin esperas eternas ni salas vacías: siempre hay alguien de tu nivel buscando partida.', bullets: ['Emparejamiento por Elo', 'Latencia < 60 ms', 'Sin salas vacías'] },
       { code: 'd4', piece: 'knight', title: 'Tu partida ideal en segundos', body: 'Olvídate de configuraciones interminables. Filtra por apuesta, ritmo y nivel, y entra a un tablero ya creado con un solo clic.', bullets: ['Bullet, blitz y rápidas', 'Filtros por apuesta', 'Entrada con un clic'] },
       { code: 'f6', piece: 'bishop', title: 'Tú pones las reglas', body: 'Diseña tu propio tablero: define cuántas Seeds hay en juego, el tiempo límite y si abres con blancas o con negras. El ganador se lo lleva todo.', bullets: ['Apuesta a medida', 'Reloj configurable', 'Elige tu color'] },
       { code: 'h8', piece: 'queen', title: 'Entorno seguro y auditado', body: 'Cifrado extremo a extremo, verificación de identidad para retiros y un sistema antitrampas que analiza cada jugada contra el motor en tiempo real.', bullets: ['Antitrampas en vivo', 'Verificación KYC', 'Retiros auditados'] },
@@ -224,17 +224,17 @@ const en: Content = {
     lead: 'Join our vibrant community of chess players and put your skills to the test in thrilling games.',
     scroll: 'Scroll',
   },
-  ticker: ['Global room 24/7', 'Bullet · Blitz · Rapid', 'Play for Seeds', 'Real-time anti-cheat', 'Verified withdrawals', '68 countries', 'You set the rules'],
+  ticker: ['Global room 24/7', 'Bullet · Blitz · Rapid', 'Play for Seeds', 'Real-time anti-cheat', 'Verified withdrawals', 'Withdrawals in USDT', 'You set the rules'],
   manifesto: {
     eyebrow: 'Manifesto',
     text: 'Chess has waited fifteen hundred years for something at stake. Here every move matters, every mistake costs, and every victory pays.',
     accent: ['stake', 'victory', 'pays'],
   },
   stats: [
-    { value: 240, suffix: 'K', label: 'Games played in beta' },
-    { value: 68, suffix: '', label: 'Countries in the global room' },
-    { value: 12, suffix: 'M', label: 'Seeds handed out' },
-    { value: 4.9, suffix: '/5', label: 'Beta rating', decimals: 1 },
+    { value: 1, suffix: ' USD', label: 'Fixed value of each Seed' },
+    { value: 36, suffix: 'h', label: 'Maximum to withdraw in USDT' },
+    { value: 0, suffix: '%', label: 'Fee on deposits or withdrawals' },
+    { value: 17, suffix: '+', label: 'Minimum age to play' },
   ],
   steps: {
     eyebrow: 'The opening · How it works',
@@ -251,7 +251,7 @@ const en: Content = {
     title: 'Everything a chessboard|should have been *all along*.',
     label: 'Feature',
     items: [
-      { code: 'b2', piece: 'rook', title: 'One global room, always open', body: 'Opponents from 68 countries at any hour. Real Elo matchmaking, no endless waits or empty rooms: there is always someone at your level looking for a game.', bullets: ['Elo matchmaking', 'Latency < 60 ms', 'No empty rooms'] },
+      { code: 'b2', piece: 'rook', title: 'One global room, always open', body: 'Opponents from around the world at any hour. Real Elo matchmaking, no endless waits or empty rooms: there is always someone at your level looking for a game.', bullets: ['Elo matchmaking', 'Latency < 60 ms', 'No empty rooms'] },
       { code: 'd4', piece: 'knight', title: 'Your ideal game in seconds', body: 'Forget endless setup. Filter by stake, time control and level, and jump into a ready-made board with a single click.', bullets: ['Bullet, blitz and rapid', 'Stake filters', 'One-click entry'] },
       { code: 'f6', piece: 'bishop', title: 'You set the rules', body: 'Design your own board: decide how many Seeds are at stake, the time limit and whether you open with white or black. Winner takes all.', bullets: ['Custom stakes', 'Configurable clock', 'Choose your color'] },
       { code: 'h8', piece: 'queen', title: 'A secure, audited environment', body: 'End-to-end encryption, identity verification for withdrawals and an anti-cheat system that checks every move against the engine in real time.', bullets: ['Live anti-cheat', 'KYC verification', 'Audited withdrawals'] },
