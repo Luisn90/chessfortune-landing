@@ -3,14 +3,11 @@ import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Seeds from '../components/Seeds.astro';
 import Faq from '../components/Faq.astro';
-import { site } from '../data/site';
 import { content } from '../i18n/content';
-import { getLang, rich } from '../i18n';
+import { getLang } from '../i18n';
 const lang = getLang(Astro.currentLocale);
 
 const t = content[lang].pages.seeds;
-const c = content[lang];
-const tiers = t.tiers as { name: string; seeds: string; price: string; note: string; featured?: boolean }[];
 ---
 
 <Layout title={t.title} description={t.description}>
@@ -18,45 +15,9 @@ const tiers = t.tiers as { name: string; seeds: string; price: string; note: str
 
   <Seeds />
 
-  <section class="py-24 lg:py-36">
+  <section class="pb-8">
     <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
-      <hr class="rule rule-fade mb-24 lg:mb-32" />
-      <p data-reveal="wipe" class="eyebrow mb-5">{t.packsEyebrow}</p>
-      <h2 data-reveal="mask" style="--reveal-delay:90ms" class="max-w-2xl text-[length:var(--text-display)]" set:html={rich(t.packsTitle)} />
-
-      <div class="mt-16 grid gap-4 lg:grid-cols-3">
-        {tiers.map((t, i) => (
-          <article
-            data-reveal="up"
-            style={`--reveal-delay:${i * 110}ms`}
-            class:list={[
-              'tilt spotlight group relative overflow-hidden rounded-card border p-9 transition-colors duration-500',
-              t.featured ? 'border-gold/50 bg-gradient-to-b from-surface-2 to-surface' : 'border-line bg-surface/40 hover:border-gold/35',
-            ]}
-          >
-            {t.featured && (
-              <span class="absolute right-5 top-5 rounded-chip bg-gold px-4 py-1.5 font-sans text-[0.6rem] uppercase tracking-[0.2em] text-navy">{t.popular}</span>
-            )}
-            <h3 class="font-display text-3xl text-white">{t.name}</h3>
-            <p class="mt-6 font-display text-5xl text-gilded">{t.seeds}</p>
-            <p class="mt-1 font-sans text-[0.68rem] uppercase tracking-[0.22em] text-mist/70">{t.unit}</p>
-            <p class="mt-8 text-sm text-mist">{t.note}</p>
-            <p class="mt-8 font-display text-2xl text-white">{t.price}</p>
-            <a
-              href={site.discord}
-              rel="noopener"
-              class:list={[
-                'mt-8 block w-full py-4 text-center font-sans text-[0.72rem] uppercase tracking-[0.2em] transition-all duration-500',
-                t.featured ? 'btn-gold text-navy' : 'btn-ghost border border-line text-ivory',
-              ]}
-            >
-              {c.common.discord}
-            </a>
-          </article>
-        ))}
-      </div>
-
-      <p class="mt-10 max-w-2xl text-xs leading-relaxed text-mist/60">
+      <p data-reveal="up" class="mx-auto max-w-3xl rounded-card border border-line/60 bg-surface/30 px-6 py-5 text-center text-xs leading-relaxed text-mist/80 lg:px-10">
         {t.disclaimer}
       </p>
     </div>
